@@ -14,16 +14,21 @@ Ir más allá del análisis univariado tradicional aislando fuentes de variabili
 ### 📁 Estructura del Repositorio
 
 ```text
-📁 Applied-Multivariate-Analysis
-├── 📄 README.md
-└── 📁 PC1
-    ├── 📄 Diseno-de-Experimentos-Multivariados-MANOVA.qmd
-    ├── 📁 data
-    │   ├── 📊 Dataset_CalidadAgua_Andina_2017_2019.xlsx
-    │   ├── 📊 datos_neuropsico.xlsx
-    │   ├── 📊 base_de_datos_palta.csv
-    │   ├── 📊 datos_manova_papa.csv
-    │   └── 📊 Data_Final_Vacas_PC1.csv
+🚀 Applied-Multivariate-Analysis
+│
+├── 📖 README.md             
+├── 📂 notebooks/            
+│   └── 🧪 PC1_MANOVA.qmd     
+│
+├── 📂 data/                  
+│   ├── 💧 Calidad_Agua.xlsx
+│   ├── 🧠 Neuropsicologia.xlsx
+│   ├── 🥑 Palta_data.csv
+│   ├── 🥔 Papa_manova.csv
+│   └── 🐄 Vacas_PC1.csv
+│
+├── 📂 scripts/               
+└── ⚙️ .gitignore             
 ```
 
 ### 📂 Casos de Estudio y Arquitectura de Datos
