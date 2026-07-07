@@ -18,7 +18,7 @@ Ir más allá del análisis univariado tradicional aislando fuentes de variabili
 │
 ├── 📖 README.md             
 ├── 📂 notebooks/            
-│   └── 🧪 PC1_MANOVA.qmd     
+│   └── 🧪 Diseno-de-Experimentos-Multivariados-MANOVA.qmd    
 │
 ├── 📂 data/                  
 │   ├── 💧 Calidad_Agua.xlsx
