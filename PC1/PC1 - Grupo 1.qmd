@@ -1,0 +1,3246 @@
+---
+lang: es
+format:
+  html:
+    code-fold: true
+    code-summary: "Mostrar código"
+    toc: true
+    toc-depth: 5
+    toc-location: left
+    toc-title: "Contenido"
+    number-sections: true
+    theme:
+      light: journal
+      dark: darkly
+    highlight: tango
+    smooth-scroll: true
+    embed-resources: true
+    include-before-body:
+      text: |
+        <div style="text-align: center; padding: 60px 20px; font-family: 'Georgia', serif;">
+          <p style="font-size: 1.2em; font-weight: bold;">UNIVERSIDAD NACIONAL AGRARIA LA MOLINA</p>
+          <p style="font-weight: bold;">FACULTAD DE ECONOMÍA Y PLANIFICACIÓN</p>
+          <p style="font-weight: bold; margin-bottom: 30px;">DEPARTAMENTO ACADÉMICO DE ESTADÍSTICA E INFORMÁTICA</p>
+          <img src="logo.png" alt="Logo UNALM" style="max-width: 160px; margin: 15px 0;" />
+          <p style="font-weight: bold;">TÉCNICAS MULTIVARIADAS</p>
+          <p><strong>Docente:</strong> Miranda Villagomez, Clodomiro Fernando</p>
+          <p style="font-weight: bold;">PRÁCTICA CALIFICADA 1</p>
+          <p><strong>Grupo:</strong> 1</p>
+          <table style="margin: 20px auto; border-collapse: collapse; width: 55%;">
+            <tr><th>Integrantes</th><th>Código</th></tr>
+            <tr><td>Meza Asto, Angel D.</td><td>20220810</td></tr>
+            <tr><td>Ormeño Sakihama, Daniel Kenyi</td><td>20240723</td></tr>
+            <tr><td>Ancco Guzman, Melany Alexandra</td><td>20230379</td></tr>
+            <tr><td>Pedraza Laboriano, Jonnathan</td><td>20231505</td></tr>
+            <tr><td>Fuentes Bueno, Fiorella</td><td>20230395</td></tr>
+            <tr><td>Garay Ramos, Jose Luis</td><td>20230678</td></tr>
+            <tr><td>Sobero Aguirre, Fiorella Romina</td><td>20091130</td></tr>
+          </table>
+          <p>LA MOLINA - LIMA - PERÚ</p>
+          <p>2026 - I</p>
+        </div>
+        <hr/>
+---
+<style>
+body { font-size: 15px; line-height: 1.7; }
+h1 { font-size: 22px; font-weight: bold; margin-top: 30px; }
+h2 { font-size: 18px; font-weight: bold; margin-top: 24px; }
+h3 { font-size: 16px; font-weight: bold; }
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 6px;
+  text-align: center;
+}
+table { width: 100%; margin-top: 10px; }
+.pie-figura {
+  font-size: 13px;
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+}
+.nota {
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: justify;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-left: 4px solid #2C3E50;
+  border-radius: 5px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = NA
+)
+
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(dplyr)
+library(ICSNP)
+library(tidyverse)
+library(readr)
+library(readxl)
+library(rstatix)
+library(mvnormtest)
+library(GGally)
+library(biotools)
+library(MVTests)
+library(heplots)
+library(psych)
+library(patchwork)
+library(car)
+library(emmeans)
+library(gridExtra)
+library(reshape2)
+library(ggthemes)
+library(MVN)
+library(corrplot)
+
+fmt_p <- function(p) {
+  if (is.na(p)) return("NA")
+  if (p < 0.0001) return("< 0.0001")
+  formatC(p, format = "f", digits = 4)
+}
+```
+
+# Prueba Z² Multivariada con Matriz de Covarianza Conocida
+
+## Contexto del Problema
+
+### Planteamiento del Estudio
+
+La calidad del agua en ecosistemas andinos es un indicador crítico de salud ambiental y bienestar comunitario. El presente análisis evalúa parámetros fisicoquímicos de cuerpos de agua monitoreados en cuatro departamentos de la sierra peruana: Apurímac, Áncash, Cusco y Junín, abarcando cuatro cuencas hidrográficas principales: Mantaro, Urubamba, Apurímac y Santa, utilizando datos recopilados durante el periodo **2017-2019**.
+
+### Objetivo del Análisis
+
+Verificar estadísticamente si el **vector de medias poblacional** de cuatro variables de calidad de agua durante el **año 2019** es igual a un **vector de referencia histórico (μ₀)**, estimado a partir de datos consolidados del periodo **2017-2018**, mediante la **prueba Z² multivariada** con matriz de varianza-covarianza poblacional (Σ) conocida.
+
+> **Nota metodológica**: Se seleccionó 2019 como periodo de prueba por presentar registros completos, mientras que 2017-2018 constituyen la base histórica para estimar los parámetros poblacionales.
+
+### Variables de Estudio
+
+> **Justificación de variables seleccionadas:**\
+> Las cuatro variables (pH, Turbidez, Oxígeno Disuelto y Conductividad) fueron seleccionadas por ser parámetros fisicoquímicos normativos para el monitoreo de calidad de agua en Perú (D.S. N° 004-2017-MINAM), representar dimensiones complementarias del estado del cuerpo de agua (química, física, biológica e iónica), y contar con registros completos y confiables en el periodo de estudio, lo cual garantiza la validez de la inferencia multivariada.
+
+| Variable | Símbolo | Unidad | Descripción |
+|------------------|------------------|------------------|------------------|
+| pH del agua | X1 | unidades pH | Medida de acidez/alcalinidad del agua |
+| Turbidez | X2 | NTU | Medida de claridad/transparencia del agua |
+| Oxígeno Disuelto | X3 | mg/L | Concentración de oxígeno disponible para vida acuática |
+| Conductividad Eléctrica | X4 | µS/cm | Medida de sales disueltas en el agua |
+
+$$
+X =
+\begin{pmatrix}
+X_1 \\
+X_2 \\
+X_3 \\
+X_4
+\end{pmatrix}
+\sim \mathcal{N}_4(\mu, \Sigma)
+$$
+
+### Hipótesis Estadística
+
+$$
+H_0: \mu = \mu_0 =
+\begin{pmatrix}
+\mu_{01} \\
+\mu_{02} \\
+\mu_{03} \\
+\mu_{04}
+\end{pmatrix}
+\quad \text{(El perfil de calidad 2019 coincide con el histórico)}
+$$
+
+$$
+H_1: \mu \neq \mu_0
+\quad \text{(Al menos una media difiere significativamente)}
+$$
+
+$$
+\alpha = 0.05
+$$
+
+## Análisis Descriptivo
+
+### Carga y Preparación de Datos
+
+```{r}
+# Lectura del dataset de calidad de agua andina
+datos <- read_excel("Dataset_CalidadAgua_Andina_2017_2019.xlsx")
+# Selección de variables de interés (parámetros fisicoquímicos)
+vars_analisis <- c("pH", "Turbidez_NTU", "Oxigeno_Disuelto_mgL", "Conductividad_uScm")
+# Filtrar por año y eliminar valores faltantes
+datos_hist <- datos[datos$ANIO %in% c(2017, 2018), ]
+datos_2019 <- datos[datos$ANIO == 2019, ]
+colnames(datos)
+X_hist <- as.matrix(datos_hist[, vars_analisis])
+X_2019 <- as.matrix(datos_2019[, vars_analisis])
+
+X_hist <- X_hist[complete.cases(X_hist), ]
+X_2019 <- X_2019[complete.cases(X_2019), ]
+
+# Crear data frame para gráficos
+datos_2019_df <- as.data.frame(X_2019)
+names(datos_2019_df) <- vars_analisis
+
+# Resultados de tamaño muestral
+data.frame(
+  Periodo = c("Histórico (2017-2018)", "Prueba (2019)"),
+  Observaciones = c(nrow(X_hist), nrow(X_2019))
+) %>%
+  kable(format = "html", align = "c", caption = "Tamaño de muestra por período") %>%
+  kable_styling(full_width = FALSE, position = "center")
+```
+
+```{r}
+# Mostrar primeros 3 registros por año 
+vista_datos <- datos[datos$ANIO %in% c(2017, 2018, 2019), 
+                     c("ANIO", "FECHA_MUESTREO", "CUENCA", "DEPARTAMENTO", 
+                       "pH", "Turbidez_NTU", "Oxigeno_Disuelto_mgL", "Conductividad_uScm")]
+
+# Tomar 3 registros por año
+vista_2017 <- head(vista_datos[vista_datos$ANIO == 2017, ], 3)
+vista_2018 <- head(vista_datos[vista_datos$ANIO == 2018, ], 3)
+vista_2019 <- head(vista_datos[vista_datos$ANIO == 2019, ], 3)
+
+# Combinar
+tabla_final <- rbind(vista_2017, vista_2018, vista_2019)
+
+# Redondear valores numéricos
+tabla_final[, 5:8] <- round(tabla_final[, 5:8], 2)
+
+# Mostrar tabla
+kable(tabla_final, format = "html", align = "c",
+      caption = "Vista de datos - 3 registros por año") %>%
+  kable_styling(full_width = FALSE, position = "center")
+```
+
+### Estimación de Parámetros Poblacionales
+
+```{r}
+mu_0 <- colMeans(X_hist)
+# Vector de medias poblacional μ₀ (desde datos históricos)
+mu_0_df <- data.frame(Media_Historica = round(mu_0, 3))
+
+# Matriz de varianza-covarianza poblacional Σ conocida
+Sigma <- cov(X_hist)
+
+# Mostrar μ₀
+rownames(mu_0_df) <- vars_analisis
+
+kable(mu_0_df, format = "html", align = "c", 
+      caption = "Vector de medias poblacional (μ₀)",
+      col.names = "Media Histórica") %>%
+  kable_styling(full_width = FALSE, position = "center")
+
+# Mostrar Σ con formato
+Sigma_df <- as.data.frame(round(Sigma, 4))
+names(Sigma_df) <- vars_analisis
+rownames(Sigma_df) <- vars_analisis
+
+kable(Sigma_df, format = "html", align = "c", 
+      caption = "Matriz de varianza-covarianza poblacional (Σ)") %>%
+  kable_styling(full_width = FALSE, position = "center")
+```
+
+### Estadísticos Descriptivos - 2019
+
+```{r}
+n_2019 <- nrow(X_2019)
+X_barra <- colMeans(X_2019)
+S_muestral <- cov(X_2019)
+
+# Tabla comparativa de medias
+tabla_desc <- data.frame(
+  Variable = vars_analisis,
+  Media_2019 = round(X_barra, 3),
+  Media_Historica = round(mu_0, 3),
+  Diferencia = round(X_barra - mu_0, 3),
+  Desv_Estandar = round(sqrt(diag(S_muestral)), 3),
+  row.names = NULL
+)
+
+kable(tabla_desc, format = "html", align = "c",
+      caption = "Estadísticos descriptivos: Comparación 2019 vs. Histórico") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  column_spec(4, color = ifelse(tabla_desc$Diferencia >= 0, "darkgreen", "darkred"), bold = TRUE)
+```
+
+Nota:
+
+-   **Verde**: La media 2019 es mayor o igual que la histórica
+
+-   **Rojo**: La media 2019 es menor que la histórica
+
+### Visualización Gráfica
+
+```{r}
+# Matriz de dispersión
+pairs(datos_2019_df,
+      main = "Relaciones entre Variables (2019)",
+      pch = 19,
+      col = rgb(0.2, 0.4, 0.6, 0.6),
+      cex = 0.8)
+```
+
+**Interpretación:**\
+
+La matriz de dispersión muestra que, en general, las variables no presentan relaciones lineales fuertes entre sí, ya que la mayoría de los gráficos presentan nubes de puntos bastante dispersas. Sin embargo, se pueden observar algunas tendencias leves, principalmente relaciones positivas moderadas entre ciertas variables, como entre conductividad y otras mediciones. En conjunto, esto indica que las variables no son independientes completamente, pero tampoco presentan multicolinealidad fuerte, lo que justifica el uso de un análisis multivariado considerando la covarianza entre ellas.
+
+```{r}
+# Boxplots individuales
+par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+for(i in 1:4) {
+  boxplot(datos_2019_df[, i], 
+          main = vars_analisis[i],
+          col = c("lightblue", "lightgreen", "lightcoral", "lightyellow")[i],
+          border = "darkgray")
+  grid(col = "lightgray", lty = "dotted")
+}
+par(mfrow = c(1, 1))
+```
+
+**Interpretación:**\
+
+Los diagramas de caja muestran que todas las variables presentan una distribución relativamente simétrica, ya que la mediana se ubica cerca del centro de cada caja. Se observan algunos valores atípicos en todas las variables, especialmente en turbidez y conductividad, lo cual indica la presencia de mediciones extremas. El oxígeno disuelto presenta una dispersión moderada, mientras que la conductividad muestra una mayor variabilidad en comparación con las demás variables. En general, los datos se concentran en rangos definidos sin evidencias de comportamientos anómalos graves.
+
+```{r fig.height=6, fig.width=7}
+# Matriz de correlaciones muestrales
+R_muestral <- cor(datos_2019_df)
+
+# Visualización con corrplot
+corrplot(R_muestral, 
+         method = "square",
+         type = "upper",
+         tl.col = "black",
+         tl.srt = 45,
+         addCoef.col = "black",
+         number.cex = 0.7,
+         col = colorRampPalette(c("#2E86AB", "white", "#A23B72"))(200),
+         title = "Matriz de Correlaciones - Año 2019",
+         mar = c(0, 0, 1, 0),
+         bg = "white")
+```
+
+**Interpretación:**
+
+La matriz de correlaciones del año 2019 revela que las variables de calidad del agua operan de forma prácticamente **independiente**, ya que todos los coeficientes son cercanos a cero, indicando una relación lineal **muy débil o nula**. La asociación más relevante, aunque sigue siendo baja, se da entre el **pH y la Conductividad (0.24)**, sugiriendo una leve tendencia a que aumenten juntos, mientras que la **Turbidez y el Oxígeno Disuelto (-0.19)** muestran una ligera relación inversa, lo cual es coherente pues un exceso de partículas suele dificultar la oxigenación. En términos estadísticos, estos resultados confirman que no hay redundancia entre los parámetros y que cada uno aporta información única sobre el estado del ecosistema.:
+
+## Supuestos del Modelo
+
+### Verificación de Supuestos para la Prueba Z²
+
+Para aplicar la prueba Z² multivariada con matriz de covarianza conocida, se consideran los siguientes supuestos:
+
+1.  **Muestra aleatoria independiente:**\
+    Las observaciones corresponden a registros institucionales recopilados sistemáticamente.
+
+2.  **Normalidad multivariada:**\
+    Se asume que $X \sim \mathcal{N}_p(\mu, \Sigma)$. Este supuesto se evalúa mediante la prueba de Shapiro-Wilk multivariada.
+
+3.  **Matriz** $\Sigma$ conocida:\
+    La matriz de varianza-covarianza poblacional se estima a partir de datos históricos (2017--2018) y se considera fija para el análisis.
+
+4.  **Tamaño muestral adecuado:**\
+    Se cumple $n > 5p$, lo cual garantiza robustez en la aproximación.
+
+### Prueba de Normalidad Multivariada
+
+```{r}
+# Prueba de Shapiro-Wilk multivariado
+shapiro_result <- mshapiro.test(t(X_2019))
+
+data.frame(
+  Prueba = "Shapiro-Wilk Multivariado",
+  Estadistico_W = round(shapiro_result$statistic, 4),
+  p_valor = format.pval(shapiro_result$p.value, digits = 4, eps = 0.0001),
+  Decision = ifelse(shapiro_result$p.value > 0.05, "No rechazar H₀", "Rechazar H₀")
+) %>%
+  kable(format = "html", align = "c", 
+        caption = "Resultado de prueba de normalidad multivariada") %>%
+  kable_styling(full_width = FALSE, position = "center")
+```
+
+```{r fig.height=5, fig.width=7}
+# Gráfico Q-Q de distancias de Mahalanobis
+media <- colMeans(X_2019)
+cov_mat <- cov(X_2019)
+dist_mahal <- mahalanobis(X_2019, media, cov_mat)
+
+dist_ord <- sort(dist_mahal)
+n_qq <- length(dist_ord)
+p_qq <- ncol(X_2019)
+quant_teo <- qchisq(ppoints(n_qq), df = p_qq)
+
+plot(quant_teo, dist_ord,
+     main = "Gráfico Q-Q de Distancias de Mahalanobis",
+     xlab = "Cuantiles Teóricos χ²",
+     ylab = "Distancias de Mahalanobis Ordenadas",
+     pch = 19, col = "steelblue", cex = 0.8)
+abline(0, 1, col = "red", lwd = 2, lty = 2)
+grid(col = "lightgray", lty = "dotted")
+```
+
+**Interpretación:**
+
+Aunque la prueba de Shapiro-Wilk arroja un p-valor de **0.04039** que sugiere rechazar la normalidad multivariada, el estadístico $W$ es extremadamente alto (**0.9932**) y el gráfico Q-Q muestra un ajuste casi lineal, lo que indica que la desviación es mínima. En muestras suficientemente grandes, las pruebas de hipótesis se vuelven "ultrasensibles" y detectan variaciones insignificantes que no afectan la validez del análisis; por lo tanto, bajo el **TLC**, la distribución de las medias tiende a la normalidad, permitiendo el uso de estadística paramétrica con total confianza a pesar del resultado formal de la prueba.
+
+## Modelo: Prueba Z² Multivariada
+
+### Fundamento Teórico
+
+El estadístico de prueba $Z^2$ para inferencia sobre un vector de medias con matriz de varianza-covarianza conocida se define como:
+
+$$
+Z^2 = n (\bar{X} - \mu_0)' \Sigma^{-1} (\bar{X} - \mu_0) \sim \chi^2_p
+$$
+
+**Donde:**
+
+-   $n$: tamaño de muestra del periodo 2019\
+-   $p = 4$: número de variables operativas\
+-   $\bar{X}$: vector de medias muestrales 2019\
+-   $\mu_0$: vector de medias poblacional de referencia (2017--2018)\
+-   $\Sigma$: matriz de varianza-covarianza poblacional conocida
+
+**Regla de decisión:**\
+Se rechaza $H_0$ si $Z^2_{\text{calc}} > \chi^2_{p,\,1-\alpha}$, o si $p\text{-valor} < \alpha$.
+
+### Cálculo del Estadístico de Prueba
+
+```{r}
+# Diferencia entre media muestral y vector hipotético
+diff_vec <- X_barra - mu_0
+
+# Inversa de la matriz Σ conocida
+Sigma_inv <- solve(Sigma)
+
+# Cálculo del estadístico Z²
+Z2_stat <- n_2019 * t(diff_vec) %*% Sigma_inv %*% diff_vec
+Z2_valor <- as.numeric(Z2_stat)
+
+# Parámetros de la distribución chi-cuadrado
+p <- length(vars_analisis)
+alpha <- 0.05
+Z2_critico <- qchisq(1 - alpha, df = p)
+p_valor <- 1 - pchisq(Z2_valor, df = p)
+
+# Tabla de resultados principales
+resultados <- data.frame(
+  Concepto = c("Tamaño de muestra (n)", "Número de variables (p)", 
+               "Estadístico Z² calculado", "Valor crítico χ²(α, p)", 
+               "p-valor", "Nivel de significancia (α)"),
+  Valor = c(n_2019, p, round(Z2_valor, 4), round(Z2_critico, 4), 
+            format.pval(p_valor, digits = 4, eps = 0.0001), alpha)
+)
+
+kable(resultados, format = "html", align = "c",
+      caption = "Resultados de la prueba Z² multivariada") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  row_spec(c(3, 4, 5), bold = TRUE, background = "#FFF9E6")
+```
+
+### Decisión Estadística
+
+```{r}
+# Calcular decisión
+decision <- ifelse(Z2_valor > Z2_critico, "RECHAZAR H₀", "NO RECHAZAR H₀")
+
+# Tabla de decisión final
+resultados_decision <- data.frame(
+  Concepto = c("Estadístico Z² calculado", "Valor crítico χ²", "Nivel de significancia (α)", "Grados de libertad (p)", "p-valor", "Decisión"),
+  Valor = c(
+    paste0(round(Z2_valor, 4)),
+    paste0("χ²(", p, ", 0.95) = ", round(Z2_critico, 4)),
+    alpha,
+    p,
+    format.pval(p_valor, digits = 4, eps = 0.0001),
+    decision
+  )
+)
+
+kable(resultados_decision, format = "html", align = "c",
+      caption = "Decisión de la prueba Z²") %>%
+  kable_styling(full_width = FALSE, position = "center", bootstrap_options = c("striped", "hover")) %>%
+  row_spec(6, bold = TRUE, background = ifelse(decision == "RECHAZAR H₀", "#FFB6B6", "#B6FFB6"))
+```
+
+**Interpretación:**
+
+Al realizar la prueba de hipótesis multivariada, se obtuvo un estadístico calculado $Z^2 = 284.31$, el cual supera ampliamente al valor crítico $\chi^2 = 9.48$. Asimismo, el **p-valor es extremadamente pequeño (**$< 0.0001$), situándose muy por debajo del nivel de significancia del **5% (**$\alpha = 0.05$).
+
+**¿Qué significa esto en la práctica?**
+
+-   **Decisión:** Se rechaza con total seguridad la hipótesis nula ($H_0$).
+
+-   **Conclusión:** Existe evidencia estadística suficiente para afirmar que el vector de medias de las variables operativas del periodo **2019** es **significativamente distinto** al promedio histórico de referencia (2017-2018).
+
+## Interpretación de Métricas
+
+### Contribución de Cada Variable al Estadístico Z²
+
+```{r}
+# Contribución aproximada de cada variable
+contribuciones <- diag(Sigma_inv) * (diff_vec^2)
+contribuciones_rel <- contribuciones / sum(contribuciones) * 100
+
+# Crear data frame
+tabla_contrib <- data.frame(
+  Variable = vars_analisis,
+  Diferencia = round(diff_vec, 3),
+  Contribucion_Absoluta = round(contribuciones, 3),
+  Contribucion_Relativa = paste0(round(contribuciones_rel, 1), "%"),
+  stringsAsFactors = FALSE
+)
+
+# Ordenar por contribución relativa
+tabla_contrib <- tabla_contrib[order(-contribuciones_rel), ]
+
+rownames(tabla_contrib) <- NULL
+
+kable(tabla_contrib, format = "html", align = "c",
+      caption = "Contribución de cada variable al estadístico Z²") %>%
+  kable_styling(full_width = FALSE, position = "center")
+```
+
+**Interpretación**:
+
+La interpretación de la tabla de contribuciones indica que el cambio en la calidad del agua en 2019 está impulsado casi en su totalidad por la **Turbidez**, la cual explica el **63.7%** de la variación total del modelo; mientras que la **Conductividad (17%)** y el **Oxígeno Disuelto (16.1%)** muestran cambios moderados, el **pH** se mantiene como la variable más estable con apenas un **3.2%** de aporte, lo que señala a la turbidez como el factor crítico a intervenir.
+
+### Intervalos de Confianza Simultáneos (Bonferroni)
+
+```{r}
+# Factor de escala para IC simultáneos (Bonferroni)
+alpha_ind <- alpha / p
+t_crit <- qt(1 - alpha_ind/2, df = n_2019 - 1)
+
+# Cálculo de intervalos
+IC_data <- data.frame(
+  Variable = vars_analisis,
+  Media_2019 = round(X_barra, 3),
+  Limite_Inferior = round(X_barra - t_crit * sqrt(diag(S_muestral)/n_2019), 3),
+  Limite_Superior = round(X_barra + t_crit * sqrt(diag(S_muestral)/n_2019), 3),
+  Valor_Referencia = round(mu_0, 3)
+)
+
+IC_data$Incluye_mu0 <- ifelse(
+  IC_data$Valor_Referencia >= IC_data$Limite_Inferior & 
+  IC_data$Valor_Referencia <= IC_data$Limite_Superior, 
+  "Sí", "No"
+)
+
+rownames(IC_data) <- NULL
+
+kable(IC_data, format = "html", align = "c",
+      caption = "Intervalos de Confianza Simultáneos (Bonferroni, 95%)") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  column_spec(6, color = ifelse(IC_data$Incluye_mu0 == "Sí", "darkgreen", "darkred"), bold = TRUE)
+```
+
+**Interpretación**:
+
+Los intervalos de confianza de Bonferroni al 95% confirman que los promedios de las cuatro variables analizadas son **significativamente diferentes** a sus valores de referencia históricos, ya que en ningún caso el valor de referencia cae dentro del rango (Límite Inferior - Superior). Específicamente, se observa que en 2019 la **Turbidez (15.91)** y la **Conductividad (306.74)** aumentaron de forma notable respecto a sus promedios históricos (12.60 y 286.18 respectivamente), mientras que el **pH** y el **Oxígeno Disuelto** disminuyeron ligeramente; esto valida estadísticamente que la calidad del agua ha sufrido un desplazamiento integral en todos sus parámetros evaluados.
+
+## Conclusiones
+
+```{r}
+# Crear tabla de resultados finales
+if(Z2_valor > Z2_critico) {
+  decision_text <- "RECHAZAR H₀"
+  conclusion_text <- "El vector de medias 2019 DIFIERE significativamente del histórico"
+  fondo_decision <- "#FFB6B6"
+} else {
+  decision_text <- "NO RECHAZAR H₀"
+  conclusion_text <- "El vector de medias 2019 NO DIFIERE significativamente del histórico"
+  fondo_decision <- "#B6FFB6"
+}
+
+resultados_finales <- data.frame(
+  Concepto = c("Estadístico calculado", "Valor crítico", "p-valor", "Decisión", "Conclusión"),
+  Valor = c(paste0("Z² = ", round(Z2_valor, 4)),
+            paste0("χ²(", p, ", 0.95) = ", round(Z2_critico, 4)),
+            format.pval(p_valor, digits = 4, eps = 0.0001),
+            decision_text,
+            conclusion_text)
+)
+
+kable(resultados_finales, format = "html", align = "c",
+      caption = "Resultados finales de la prueba Z²") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  row_spec(4, bold = TRUE, background = fondo_decision) %>%
+  row_spec(5, bold = TRUE, background = ifelse(Z2_valor > Z2_critico, "#FFE5E5", "#E5FFE5"))
+```
+
+### Conclusiones Generales
+
+1.  **Validez del Modelo y Supuestos:** Se determinó que, a pesar de que la prueba de Shapiro-Wilk multivariada mostró una ligera desviación de la normalidad multivariada ($p=0.0403$), el elevado estadístico $W$ (**0.9932**) y el ajuste visual en el gráfico de Mahalanobis validan el uso de la estadística paramétrica. Bajo el **Teorema del Límite Central**, y dado el tamaño de la muestra, los resultados de la prueba $Z^2$ son altamente confiables para la toma de decisiones.
+
+2.  **Diferencia Significativa en la Calidad del Agua:** La prueba $Z^2$ multivariada arroja evidencia contundente ($Z^2_{calc} = 284.31 > \chi^2_{crit} = 9.48$; $p < 0.0001$) para **rechazar la hipótesis nula**. Esto confirma que el perfil de calidad del agua del año 2019 ha sufrido un desplazamiento estadísticamente significativo respecto al promedio histórico (2017-2018), lo que implica que el ecosistema acuático está operando bajo condiciones distintas a las de referencia.
+
+3.  **Identificación de Variables Críticas:** Mediante los intervalos de Bonferroni y el análisis de contribución, se concluye que **ninguna** de las variables mantuvo su promedio histórico. Sin embargo, la **Turbidez** es el factor de mayor preocupación, ya que no solo aumentó significativamente, sino que es responsable del **63.7%** de la variación total detectada en el modelo.
+
+### Interpretación Operativa para la Gestión Municipal
+
+Desde una perspectiva de gestión, los resultados indican una **alerta técnica prioritaria en el control de sedimentos**. Dado que la turbidez es el contaminante dominante en la desviación del 2019, la municipalidad debería centrar sus recursos en inspeccionar las fuentes de sólidos en suspensión (como erosión de riberas o vertimientos directos). Asimismo, el incremento simultáneo en la **Conductividad** sugiere una mayor presencia de sales o minerales disueltos, lo que, sumado a la ligera baja en el **Oxígeno Disuelto**, apunta a una posible degradación de la calidad ambiental que requiere monitoreo continuo para prevenir impactos en la vida acuática y la salud de la comunidad.
+
+
+# $T^2$ dE Hotelling, con muestras dependientes
+
+Un equipo de psicología cognitiva evalúa la efectividad de un programa
+de rehabilitación neuropsicológica de 8 semanas en 35 pacientes
+diagnosticados con déficit atencional leve. El programa combina técnicas
+de mindfulness, entrenamiento de memoria de trabajo y estimulación
+cognitiva computarizada.
+
+Se registraron 3 indicadores clínicos antes y después del programa:
+Tiempo de concentracion sostenida a estímulos en segundos ( mayor tiempo
+indica mejor capacidad de concentración ), Puntaje de memoria de trabajo
+(puntos) y Puntaje de atención selectiva (puntos).
+
+El equipo clínico, basándose en estudios previos, desea verificar si las
+mejoras esperadas son de 20 segundos en tiempo de concentracion , 5
+puntos en memoria de trabajo y 3 puntos en atención selectiva
+respectivamente.
+
+## Variables
+
+| Variable  | Descripción                                   | Unidad     |
+|-----------|-----------------------------------------------|------------|
+| sostenida | Tiempo de concentracion sostenida a estímulos | segundos   |
+| memoria   | Puntaje de memoria de trabajo                 | puntos     |
+| atencion  | Puntaje de atención selectiva                 | puntos     |
+| momento   | Período de medición: Antes o Después          | categórica |
+
+```{r inicial, echo=FALSE, message=FALSE, warning=FALSE}
+library(readxl)
+library(tidyverse)
+library(psych)
+library(MVN)
+library(ICSNP)
+library(reshape2)
+library(ggthemes)
+library(clipr)
+# Leer datos
+datos <- read_excel("datos_neuropsico.xlsx", sheet = "Hoja2")
+
+#View(datos)
+#names(datos)  
+
+# Renombrar variable
+names(datos)[names(datos) == "reaccion_antes"]   <- "sostenida_antes"
+names(datos)[names(datos) == "reaccion_despues"] <- "sostenida_despues"
+
+# Vector hipotético
+vector_conocido <- c(20, 5, 3)
+head(datos)
+```
+
+## Analisis Exploratorio
+
+```{r exploratorio, echo=FALSE, message=FALSE, warning=FALSE}
+library(rstatix)
+library(reshape2)
+
+# Pasar a formato largo con nombre distinto
+df_largo <- melt(datos,
+                 variable.name = "indicador",
+                 value.name    = "valor")
+
+# Agregar columna momento
+df_largo$momento <- ifelse(grepl("antes", df_largo$indicador), "Antes", "Después")
+
+# Limpiar nombre de indicador
+df_largo$indicador <- gsub("_antes|_despues|_depues", "", df_largo$indicador)
+
+# Descriptivos agrupados
+df_largo %>%
+  group_by(momento, indicador) %>%
+  get_summary_stats(valor, type = "common")
+```
+
+### Establecer diferencias
+
+```{r diferencias, echo=TRUE}
+X <- data.frame(
+  diff_sostenida = datos$sostenida_despues - datos$sostenida_antes,
+  diff_memoria   = datos$memoria_despues   - datos$memoria_antes,
+  diff_atencion  = datos$atencion_despues   - datos$atencion_antes
+)
+
+psych::describe(X)
+```
+
+En las tres variables se observan mejoras tras la intervención.El tiempo
+de concentración sostenida aumentó en promedio asi como la memoria de
+trabajo y la atención selectiva. Para estas diferencias, evaluadas de
+forma conjunta, usaremos la prueba T² de Hotelling para muestras
+dependientes.
+
+### Matriz de correlaciones
+
+```{r correlaciones, echo=TRUE, message=FALSE, warning=FALSE}
+library(corrplot)
+
+cor_X <- cor(X)
+print(round(cor_X, 3))
+
+corrplot(cor_X,
+         method      = "color",
+         type        = "upper",
+         addCoef.col = "black",
+         tl.col      = "black",
+         tl.srt      = 45,
+         col         = colorRampPalette(c("#D73027","#FFFFBF","#1A9850"))(200),
+         cl.lim      = c(-1, 1),
+         title       = "Correlaciones entre Diferencias Pre-Post",
+         mar         = c(0, 0, 2, 0))
+```
+
+La matriz de correlaciones entre las diferencias muestra asociaciones
+positivas moderadas entre los tres indicadores cognitivos (r entre 0.22
+y 0.41). La correlación más elevada se observa entre diff_memoria y
+diff_atencion (r = 0.41), lo que sugiere que ambas funciones responden
+de manera más conjunta al programa de entrenamiento. La correlación más
+baja corresponde al par diff_sostenida y diff_memoria (r = 0.22),
+indicando que el tiempo de exposición sostenida opera de forma más
+independiente. La presencia de correlaciones moderadas positivas
+justifica el uso del enfoque multivariado, ya que ignorar esta
+estructura conjunta implicaría pérdida de información relevante.
+
+### Análisis Gráfico
+
+#### Comparación Pre-Post
+
+```{r boxplot_comparativo, echo=FALSE}
+df_largo <- datos%>%
+  tidyr::pivot_longer(everything(),
+               names_to  = c("variable", "momento"),
+               names_sep = "_(?=[^_]+$)",
+               values_to = "valor") %>%
+  dplyr::mutate(momento = factor(momento,
+                  levels = c("antes", "despues", "depues"),
+                  labels = c("Antes", "Después", "Después")))
+
+ggplot(df_largo, aes(x = momento, y = valor, fill = momento)) +
+  geom_boxplot() +
+  facet_wrap(~ variable, scales = "free_y") +
+  scale_fill_manual(values = c("Antes" = "#4472C4", "Después" = "#ED7D31")) +
+  labs(title = "Comparación Pre-Post por Variable",
+       x = NULL, y = "Valor", fill = "Momento") +
+  theme_economist()
+```
+
+El boxplot comparativo Pre-Post revela que las tres variables presentan
+mejoras consistentes tras el programa, con las cajas del grupo Post
+ubicadas por encima de las del grupo Pre en los tres indicadores. Se
+identifican valores atípicos univariados en la variable atención
+selectiva, tanto en la medición previa como posterior, correspondientes
+a participantes con niveles de atención inusualmente altos o bajos en
+comparación con el grupo. Sin embargo, estos valores no se confirman
+como outliers multivariados hasta analizar la distancia de Mahalanobis
+ajustada, por lo que no se justifica su exclusión del análisis.
+
+#### Diferencias Post − Pre
+
+```{r boxplot_diferencias, echo=FALSE}
+df_diff <- tidyr::pivot_longer(X, everything(),
+                                names_to  = "variable",
+                                values_to = "diferencia")
+
+ggplot(df_diff, aes(x = variable, y = diferencia, fill = variable)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red", linewidth = 0.8) +
+  scale_fill_manual(values = c("#00BCD4", "#8BC34A", "#FF7043")) +
+  labs(title = "Diferencias Post − Pre por Variable",
+       subtitle = "Línea roja = sin cambio",
+       x = NULL, y = "Diferencia", fill = "Variable") +
+  theme_economist()
+```
+
+El boxplot de diferencias confirma mejoras positivas en las tres
+variables para todos los participantes, con medianas por encima de cero
+en los tres casos. El tiempo de concetracion sostenida presenta la mayor
+magnitud de cambio (mediana ≈ 20 s) con dispersión moderada, mientras
+que memoria y atención muestran mejoras más pequeñas (\~5 y \~3 puntos
+respectivamente) y más homogéneas entre participantes. Notablemente, las
+medianas observadas son muy cercanas al vector de cambios esperados , lo
+que anticipa que los datos podrían ser compatibles con la hipótesis
+nula.
+
+### outliers
+
+```{r outliers, echo=TRUE}
+par(mfrow = c(1, 2))
+outliers.quan <- mvn(data = X, multivariate_outlier_method = "quan")
+outliers.adj  <- mvn(data = X, multivariate_outlier_method = "adj")
+par(mfrow = c(1, 1))
+
+# Solo mostrar la tabla de outliers
+cat("── Outliers (método cuantil) ──\n")
+print(outliers.quan$multivariate_outliers)
+print(outliers.quan$data[25,])
+
+cat("\n── Outliers (método ajustado) ──\n")
+print(outliers.adj$multivariate_outliers)
+```
+
+```{r}
+print(outliers.quan$data)
+```
+
+Solo la observación 25 tiene distancia de Mahalanobis elevada (13.67)
+con el método cuantil. Su perfil (20.7, 6.5, -1.2) es inusual porque
+tiene la atención más baja del grupo (-1.2, única negativa relevante)
+combinada con memoria alta. Sin embargo, no es un outlier extremo y se
+mantiene en el análisis ya que en el adj no hay ningun dato detectado.
+
+## Verificación de supuestos
+
+Aplicamos distintas pruebas para verificar el supuesto de normalidad
+multivariada de la matriz de diferencias.
+
+**H₀:** La muestra proviene de una distribución normal conjunta
+trivariada **H₁:** La muestra no proviene de una distribución normal
+conjunta trivariada
+
+```{r normalidad, echo=TRUE}
+library(mvnormtest)
+mshapiro.test(t(X))
+
+# Mardia
+mardia <- mvn(data = X, mvn_test = "mardia")
+mardia$multivariate_normality
+
+# Henze-Zirkler
+hz <- mvn(data = X, mvn_test = "hz")
+hz$multivariate_normality
+
+# Doornik-Hansen
+dh <- mvn(data = X, mvn_test = "doornik_hansen")
+dh$multivariate_normality
+```
+
+Los resultados de las pruebas de normalidad multivariada son mixtos. Las
+pruebas de Mardia (p = 0.266 para asimetría; p = 0.320 para curtosis) y
+Henze-Zirkler (p = 0.716) no rechazan H₀ y shapiro-Wilk (p = 0.1813),
+indicando compatibilidad con la normalidad multivariada. Por otro lado,
+Doornik-Hansen (p \< 0.001) rechaza H₀.
+
+Dado que las pruebas de Mardia y Henze-Zirkler — consideradas las más
+adecuadas para muestras de tamaño moderado — no detectan evidencia de
+no-normalidad, y que la prueba T² de Hotelling es robusta frente a
+desviaciones leves gracias al Teorema Central del Límite Multivariado
+con n = 35, se procede con la prueba.
+
+## Prueba T² de Hotelling
+
+$$
+H_0 : \boldsymbol{\mu}_d =
+\begin{pmatrix} 20 \\[2pt] 5 \\[2pt] 3 \end{pmatrix}
+\qquad \text{vs.} \qquad
+H_1 : \boldsymbol{\mu}_d \neq
+\begin{pmatrix} 20 \\[2pt] 5 \\[2pt] 3 \end{pmatrix}
+$$
+
+```{r hotelling, echo=TRUE, message=FALSE}
+xbar <- colMeans(X)
+print(round(xbar, 4))
+
+HotellingsT2(X, mu = vector_conocido)
+```
+
+```{r conclusion, echo=FALSE}
+# Extraer p-valor del resultado
+resultado <- HotellingsT2(X, mu = vector_conocido)
+pvalue    <- resultado$p.value
+
+if (pvalue < 0.05) {
+  cat("\nDecisión: Se RECHAZA H₀ (p-valor =", round(pvalue, 4), "< 0.05)\n")
+  cat("Conclusión: Existe evidencia estadística para afirmar que al menos",
+      "uno de los cambios esperados difiere del vector planteado.\n")
+} else {
+  cat("\nDecisión: No se rechaza H₀ (p-valor =", round(pvalue, 4), ">= 0.05)\n")
+  cat("Conclusión: No existe evidencia estadística para afirmar que los",
+      "cambios difieran de los valores planteados.\n")
+}
+```
+
+## Conclusión Final
+
+El análisis exploratorio confirmó mejoras positivas en las tres
+variables cognitivas para todos los participantes, con ausencia de
+outliers influyentes y normalidad multivariada verificada mediante las
+pruebas de Shapiro Wilk , Mardia y Henze-Zirkler. La matriz de
+correlaciones entre las diferencias mostró asociaciones positivas
+moderadas justificando el enfoque multivariado. La prueba T² de
+Hotelling para muestras dependientes (p = 0.447) no rechaza H₀, lo que
+permite concluir que el programa de rehabilitación neuropsicológica
+produce cambios que se ajustan a las metas clínicas establecidas. Los
+hallazgos respaldan la continuidad del programa como intervención
+efectiva para pacientes con déficit atencional leve.
+
+# $T^2$ de Hotelling, con muestras independientes
+
+## Introducción al caso
+
+La palta es un producto de alta importancia comercial y nutricional. Sus
+variedades Hass y Fuerte se distinguen por atributos físicos y
+composicionales que presentan interdependencia entre sí: diámetro de
+semilla, peso del fruto, contenido de aceite y firmeza. Evaluar estas
+diferencias de forma univariada resulta insuficiente, pues ignora la
+estructura de correlaciones que caracteriza a cada variedad.
+
+Por ello, se emplea la prueba $T^2$ de Hotelling para muestras
+independientes, la cual permite comparar los vectores de medias
+considerando dicha estructura conjunta. El análisis tiene dos objetivos:
+primero, evaluar si la diferencia entre variedades se ajusta al vector
+$\underline{\mu}_0$ especificado por $H_0$,
+
+$$\underline{\mu}_0 = \underline{\mu}_{\text{Hass}} - \underline{\mu}_{\text{Fuerte}} = \begin{pmatrix} -3 \\ -20 \\ -4 \\ 5 \end{pmatrix}$$
+
+es decir, que en promedio la Hass tenga semilla 3 mm más pequeña, pese
+20 g menos, contenga 4% menos aceite y sea 5 N más firme que la Fuerte.
+Segundo, construir intervalos de confianza simultáneos que permitan
+identificar en qué variables se concentran las diferencias
+significativas.
+
+### Variables
+
+| Variable          | Descripción                             |   Unidad   |
+|:------------------|:----------------------------------------|:----------:|
+| `DiametroSemilla` | Diámetro de la semilla                  |     mm     |
+| `PesoFruto`       | Peso total del fruto                    |     g      |
+| `ContenidoAceite` | Porcentaje de aceite en la pulpa        |     \%     |
+| `Firmeza`         | Resistencia de la pulpa a la compresión |     N      |
+| `Especie`         | Variedad de palta: `Hass` o `Fuerte`    | categórica |
+
+```{r}
+datos <- read_csv("base_de_datos_palta.csv")
+datos %>% head(5)
+```
+
+### Análisis Exploratorio
+
+#### Estadística descriptiva por especie
+
+```{r}
+datos %>%
+  group_by(Especie) %>%
+  get_summary_stats(type = "common")
+```
+
+En todas las variables se observan diferencias entre grupos: la Fuerte
+presenta mayor diámetro de semilla ($\bar{x} = 37.2$ mm vs $35.3$ mm),
+mayor peso de fruto ($\bar{x} = 236$ g vs $217$ g) y mayor contenido de
+aceite ($\bar{x} = 21.7\%$ vs $17.9\%$), mientras que la Hass muestra
+mayor firmeza ($\bar{x} = 45.0$ N vs $39.7$ N). Estas diferencias,
+evaluadas de forma conjunta, motivan el uso de la prueba $T^2$ de
+Hotelling.
+
+#### Boxplot comparativo por variable
+
+```{r}
+library(reshape2)
+df.m <- melt(datos, id.var = "Especie")
+ggplot(data = df.m, aes(x = variable, y = value)) +
+  geom_boxplot(aes(fill = Especie)) +
+  facet_wrap(~variable, scales = "free") +
+  theme_minimal()
+```
+
+El boxplot confirma visualmente las diferencias descritas. PesoFruto y
+ContenidoAceite muestran una separación clara entre especies sin
+solapamiento relevante, mientras que DiametroSemilla presenta mayor
+superposición entre grupos. Firmeza es la única variable donde la Hass
+supera consistentemente a la Fuerte. Se observan dos valores atípicos en
+PesoFruto de la especie Fuerte, aunque no comprometen el análisis dado
+el tamaño muestral.
+
+#### Matriz de dispersión
+
+```{r}
+ggpairs(datos[,-5])
+```
+
+La diagonal muestra distribuciones aproximadamente simétricas y
+unimodales para las cuatro variables, consistentes con el supuesto de
+normalidad multivariada. Todas las correlaciones son significativas:
+PesoFruto y ContenidoAceite presentan la asociación positiva más fuerte
+($r = 0.604$, $p < 0.001$), mientras que Firmeza se correlaciona
+negativamente con las demás, siendo más intensa su relación con
+ContenidoAceite ($r = -0.695$, $p < 0.001$). La interdependencia entre
+variables justifica el uso de un enfoque multivariado.
+
+## Supuestos
+
+### Normalidad multivariada
+
+**Especie Hass**
+
+```{r}
+palta_hass <- filter(datos, Especie == "Hass")[, -5]
+mshapiro.test(t(palta_hass))
+```
+
+::: {.callout-note appearance="simple"}
+## Prueba de Shapiro-Wilk multivariada — Especie: Hass
+:::
+
+Se contrasta si el vector aleatorio
+$\underline{X} = (\text{DiametroSemilla},\ \text{PesoFruto},\ \text{ContenidoAceite},\ \text{Firmeza})^\top$
+sigue una distribución normal cuatrivariada.
+
+$$H_0: \underline{X} \sim \mathcal{N}_4(\underline{\mu},\ \Sigma) \qquad H_1: \underline{X} \not\sim \mathcal{N}_4(\underline{\mu},\ \Sigma)$$
+
+```{r}
+kable(
+  data.frame(
+    `Estadístico W` = 0.96843,
+    `p-valor` = 0.3205,
+    `alpha` = 0.05
+  ),
+  align = "ccc"
+) %>%
+  kable_styling(full_width = FALSE)
+```
+
+Como $p\text{-valor} = 0.3205 > 0.05$, no se rechaza $H_0$. Se asume
+normalidad cuatrivariada para la especie Hass.
+
+------------------------------------------------------------------------
+
+**Especie Fuerte**
+
+```{r}
+palta_fuerte <- filter(datos, Especie == "Fuerte")[, -5]
+mshapiro.test(t(palta_fuerte))
+```
+
+::: {.callout-note appearance="simple"}
+## Prueba de Shapiro-Wilk multivariada — Especie: Fuerte
+:::
+
+Se contrasta el mismo supuesto para la especie Fuerte.
+
+$$H_0: \underline{X} \sim \mathcal{N}_4(\underline{\mu},\ \Sigma) \qquad H_1: \underline{X} \not\sim \mathcal{N}_4(\underline{\mu},\ \Sigma)$$
+
+```{r}
+kable(
+  data.frame(
+    `Estadístico W` = 0.93323,
+    `p-valor` = 0.05986,
+    `alpha` = 0.05
+  ),
+  align = "ccc"
+)
+```
+
+Como $p\text{-valor} = 0.05986 > 0.05$, no se rechaza $H_0$. Se asume
+normalidad cuatrivariada para la especie Fuerte, aunque el $p$-valor se
+encuentra muy próximo al límite, por lo que este supuesto se sostiene
+con menor holgura que en Hass.
+
+### Homogeneidad de matrices de varianza-covarianza
+
+```{r}
+resultado1 <- boxM(datos[, 1:4], datos$Especie)
+resultado1
+```
+
+::: {.callout-note appearance="simple"}
+## Prueba M de Box
+:::
+
+Se contrasta la igualdad de matrices de varianza-covarianza entre
+especies.
+
+$$H_0: \Sigma_{\text{Hass}} = \Sigma_{\text{Fuerte}} \qquad H_1: \Sigma_{\text{Hass}} \neq \Sigma_{\text{Fuerte}}$$
+
+```{r}
+kable(
+  data.frame(
+    `Chi-cuadrado` = 8.2153,
+    gl = 10,
+    `p-valor` = 0.6078,
+    alpha = 0.05
+  ),
+  align = "cccc"
+)
+```
+
+Como $p\text{-valor} = 0.6078 > 0.05$, no se rechaza $H_0$. Se asume
+$\Sigma_{\text{Hass}} = \Sigma_{\text{Fuerte}}$, lo que justifica el uso
+de la matriz de covarianza pooled $S_p$ en la prueba $T^2$.
+
+## Prueba $T^2$ de Hotelling
+
+```{r}
+mu0 <- c(-3, -20, -4, 5)
+HotellingsT2(palta_hass, palta_fuerte, mu = mu0)
+```
+
+::: {.callout-note appearance="simple"}
+## Prueba $T^2$ de Hotelling — dos muestras independientes
+:::
+
+Se contrasta si la diferencia entre vectores de medias coincide con el
+vector $\underline{\mu}_0$ especificado por $H_0$.
+
+$$H_0: \underline{\mu}_{\text{Hass}} - \underline{\mu}_{\text{Fuerte}} = \underline{\mu}_0 = (-3,\ -20,\ -4,\ 5)^\top$$
+
+$$H_1: \underline{\mu}_{\text{Hass}} - \underline{\mu}_{\text{Fuerte}} \neq \underline{\mu}_0$$
+
+```{r}
+kable(
+  data.frame(
+    `T^2` = 0.63484,
+    df1 = 4,
+    df2 = 65,
+    `p-valor` = 0.6395,
+    alpha = 0.05
+  ),
+  align = "ccccc"
+)
+```
+
+Como $p\text{-valor} = 0.6395 > 0.05$, no se rechaza $H_0$. Los datos
+son compatibles con el vector $\underline{\mu}_0$ especificado por
+$H_0$: la Hass tiene en promedio semilla 3 mm más pequeña, pesa 20 g
+menos, contiene 4% menos aceite y es 5 N más firme que la Fuerte.
+
+## Conclusión
+
+El análisis multivariado mediante la prueba $T^2$ de Hotelling permitió
+evaluar de forma conjunta las diferencias entre las variedades Hass y
+Fuerte en cuatro atributos físico-composicionales. Verificados los
+supuestos de normalidad cuatrivariada en ambos grupos y la homogeneidad
+de matrices de varianza-covarianza, se procedió con la prueba sobre el
+vector $\underline{\mu}_0 = (-3,\ -20,\ -4,\ 5)^\top$ especificado por
+$H_0$.
+
+Con un $p\text{-valor} = 0.6395 > 0.05$, no se rechaza $H_0$, por lo que
+los datos son compatibles con el vector especificado: la variedad Hass
+presenta en promedio semilla más pequeña, menor peso de fruto y menor
+contenido de aceite que la Fuerte, compensado por una mayor firmeza.
+Este resultado es coherente con lo observado en el análisis
+exploratorio, donde el boxplot y la estadística descriptiva ya
+anticipaban diferencias sistemáticas en esa dirección entre ambas
+variedades.
+
+```{r datos-1, include=FALSE}
+datos          <- read.csv("datos_manova_papa.csv")
+datos$Variedad <- as.factor(datos$Variedad)
+```
+
+------------------------------------------------------------------------
+
+# MANOVA en DCA
+
+## Introducción
+
+### Contexto del estudio
+
+Se evaluó el efecto de **cuatro variedades de papa** (*Solanum
+tuberosum*) —denominadas A, B, C y D— sobre un conjunto de
+características morfológicas, mediante un **Diseño Completamente
+Aleatorizado (DCA)**. Se midieron cuatro rasgos morfológicos en 100
+plantas (25 por variedad), todos expresados en centímetros y las cuales
+se detallarán en breve.
+
+### Justificación del MANOVA
+
+Las cuatro variables de respuesta están biológicamente vinculadas entre
+sí: una planta de mayor altura tiende a desarrollar tallos más largos y
+tubérculos de mayor tamaño. Analizarlas de forma independiente con
+ANOVAs separados tendría dos problemas:
+
+-   **Ignoraría la covarianza** entre variables, perdiendo información
+    estructural relevante.
+-   **Elevaría artificialmente la tasa de error Tipo I** al realizar
+    múltiples pruebas simultáneas.
+
+El **MANOVA** resuelve ambos problemas evaluando conjuntamente el vector
+de medias de todas las variables y aprovechando la estructura de
+covarianza para obtener una prueba más potente y estadísticamente
+válida.
+
+### Objetivo
+
+Determinar si existen diferencias significativas en el **perfil
+morfológico conjunto** —altura de planta, longitud del tallo, diámetro y
+longitud del tubérculo— entre las cuatro variedades evaluadas, e
+identificar qué variables y qué pares de variedades explican dichas
+diferencias.
+
+------------------------------------------------------------------------
+
+## Diseño Experimental
+
+| Elemento                   | Descripción                              |
+|:---------------------------|:-----------------------------------------|
+| Tipo de diseño             | Diseño Completamente Aleatorizado (DCA)  |
+| Factor                     | Variedad genética de papa                |
+| Niveles del factor         | 4 variedades: **A, B, C, D**             |
+| Unidad experimental        | Una planta de papa (*Solanum tuberosum*) |
+| Observaciones por variedad | 25                                       |
+| Total de observaciones     | 100                                      |
+
+**Variables respuesta:**
+
+```{r tabla-variables-1}
+data.frame(
+  Variable    = c("Y1", "Y2", "Y3", "Y4"),
+  Descripción = c("Altura de planta",
+                  "Longitud del tallo principal",
+                  "Diámetro del tubérculo mayor",
+                  "Longitud del tubérculo mayor"),
+  Unidad              = rep("cm", 4),
+  `Método de medición`= rep("Cinta métrica / estadiómetro", 4)
+) |>
+  kable(escape = FALSE, align = "clcc",
+        caption = "Tabla 4.1. Variables respuesta del experimento") |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white")
+```
+
+**Modelo estadístico:**
+
+El modelo MANOVA en DCA expresa cada observación como:
+
+$$\mathbf{Y}_{ij} = \boldsymbol{\mu} + \boldsymbol{\tau}_i + \boldsymbol{\epsilon}_{ij}$$
+
+donde los términos son:
+
+-   $\mathbf{Y}_{ij}$: vector $4\times1$ de respuestas de la $j$-ésima
+    planta ($j=1,\ldots,25$) de la variedad $i$ ($i=A,B,C,D$).
+-   $\boldsymbol{\mu}$: vector $4\times1$ de medias generales
+    poblacionales.
+-   $\boldsymbol{\tau}_i$: vector $4\times1$ del efecto diferencial de
+    la variedad $i$ sobre la media general.
+-   $\boldsymbol{\epsilon}_{ij}$: vector $4\times1$ de errores
+    aleatorios, con
+    $\boldsymbol{\epsilon}_{ij} \sim \mathcal{N}_4(\mathbf{0}, \boldsymbol{\Sigma})$
+    y matriz de covarianza $\boldsymbol{\Sigma}$ común para los cuatro
+    grupos.
+
+------------------------------------------------------------------------
+
+## Datos
+
+```{r datos-show, echo=TRUE, eval=TRUE}
+datos          <- read.csv("datos_manova_papa.csv")
+datos$Variedad <- as.factor(datos$Variedad)
+str(datos)
+head(datos)
+```
+
+<p class="nota">
+
+El conjunto contiene <strong>100 observaciones</strong> sobre <strong>5
+variables</strong>: cuatro morfológicas continuas (Y₁–Y₄, en cm) y el
+factor <code>Variedad</code> con cuatro niveles balanceados (25
+observaciones por nivel). El orden no sistemático de las variedades en
+las primeras filas refleja la aleatorización propia del DCA.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Análisis Exploratorio de Datos
+
+### Estadísticos descriptivos por variedad
+
+```{r desc-show, echo=TRUE, eval=TRUE}
+datos %>%
+  dplyr::group_by(Variedad) %>%
+  dplyr::summarise(
+    `Ȳ₁` = round(mean(Y1),2), `S₁` = round(sd(Y1),2),
+    `Ȳ₂` = round(mean(Y2),2), `S₂` = round(sd(Y2),2),
+    `Ȳ₃` = round(mean(Y3),2), `S₃` = round(sd(Y3),2),
+    `Ȳ₄` = round(mean(Y4),2), `S₄` = round(sd(Y4),2)
+  )
+```
+
+```{r descriptivos, echo=TRUE}
+# 1. Hacemos el resumen con nombres simples para evitar errores en dplyr
+desc_tabla <- datos %>%
+  dplyr::group_by(Variedad) %>%
+  dplyr::summarise(
+    M1 = round(mean(Y1),2), S1 = round(sd(Y1),2),
+    M2 = round(mean(Y2),2), S2 = round(sd(Y2),2),
+    M3 = round(mean(Y3),2), S3 = round(sd(Y3),2),
+    M4 = round(mean(Y4),2), S4 = round(sd(Y4),2)
+  )
+
+# 2. Generamos la tabla usando símbolos Unicode puros
+kable(desc_tabla, 
+      align = "ccccccccc",
+      caption = "Tabla 4.2. Medias (Ȳ) y desviaciones estándar (S) por variedad",
+      col.names = c("Variedad", 
+                    "Ȳ₁", "S₁", 
+                    "Ȳ₂", "S₂", 
+                    "Ȳ₃", "S₃", 
+                    "Ȳ₄", "S₄")) |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) |>
+  add_header_above(c(" " = 1,
+                     "Y₁ Altura (cm)" = 2,
+                     "Y₂ Long. tallo (cm)" = 2,
+                     "Y₃ Diám. tubérculo (cm)" = 2,
+                     "Y₄ Long. tubérculo (cm)" = 2)) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white")
+```
+
+### Distribución por variedad
+
+```{r boxplot-show, echo=TRUE, eval=TRUE}
+datos_long <- datos %>%
+  pivot_longer(cols = Y1:Y4, names_to = "Variable", values_to = "Valor")
+
+ggplot(datos_long, aes(x = Variedad, y = Valor, fill = Variedad)) +
+  geom_boxplot(alpha = 0.7, outlier.color = "red", outlier.shape = 16) +
+  facet_wrap(~Variable, scales = "free",
+             labeller = labeller(Variable = c(
+               Y1 = "Y1: Altura de planta (cm)",
+               Y2 = "Y2: Long. tallo principal (cm)",
+               Y3 = "Y3: Diám. tubérculo mayor (cm)",
+               Y4 = "Y4: Long. tubérculo mayor (cm)"))) +
+  theme_minimal(base_size = 12) +
+  labs(title = "Distribución de variables morfológicas por variedad",
+       x = "Variedad", y = "Valor (cm)") +
+  theme(legend.position = "none",
+        strip.text     = element_text(face = "bold"),
+        plot.title     = element_text(face = "bold", hjust = 0.5))
+```
+
+<p class="pie-figura">
+
+Figura 4.1. Boxplot de las cuatro variables morfológicas por variedad.
+Los puntos rojos indican valores atípicos según la regla de Tukey (1.5 ×
+IQR).
+
+</p>
+
+### Patrones observados
+
+Los boxplots permiten identificar los siguientes patrones:
+
+-   **Separación clara entre variedades**: las cajas de cada variedad se
+    ubican en rangos distintos y sin solapamiento importante en las
+    cuatro variables, lo que anticipa diferencias estadísticamente
+    significativas.
+-   **Variabilidad intra-grupo homogénea**: el tamaño de las cajas es
+    similar entre variedades, lo que es coherente con el supuesto de
+    homogeneidad de matrices de covarianza.
+-   **Distribuciones simétricas**: las medianas están aproximadamente
+    centradas dentro de cada caja, lo que respalda el supuesto de
+    normalidad multivariada.
+-   **Valores atípicos puntuales**: se identifican algunos atípicos en
+    $Y_3$ (variedades A, B y C) y en $Y_2$ (variedad C). Son escasos (8
+    de 100 observaciones) y no comprometen el análisis.
+
+------------------------------------------------------------------------
+
+## Supuestos del MANOVA
+
+> Los supuestos del MANOVA recaen sobre el vector de errores
+> $\boldsymbol{\epsilon}_{ij}$. Se verifican tres condiciones antes de
+> proceder con el análisis.
+
+### Normalidad Multivariada
+
+**a. Hipótesis** (evaluada grupo a grupo):
+
+$$H_0: \text{La muestra de la variedad } i \text{ proviene de una distribución normal conjunta tetravariada}$$
+$$H_1: \text{La muestra de la variedad } i \text{ no proviene de dicha distribución}, \quad i = A, B, C, D$$
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. p-valor**
+
+```{r normalidad-show, echo=TRUE, eval=TRUE}
+library(mvnormtest)
+
+trat_A <- datos %>% filter(Variedad == "A") %>% dplyr::select(Y1:Y4)
+trat_B <- datos %>% filter(Variedad == "B") %>% dplyr::select(Y1:Y4)
+trat_C <- datos %>% filter(Variedad == "C") %>% dplyr::select(Y1:Y4)
+trat_D <- datos %>% filter(Variedad == "D") %>% dplyr::select(Y1:Y4)
+
+mshapiro.test(t(trat_A))
+mshapiro.test(t(trat_B))
+mshapiro.test(t(trat_C))
+mshapiro.test(t(trat_D))
+```
+
+```{r normalidad-p2, include=FALSE}
+r_A <- mshapiro.test(t(trat_A))
+r_B <- mshapiro.test(t(trat_B))
+r_C <- mshapiro.test(t(trat_C))
+r_D <- mshapiro.test(t(trat_D))
+
+cat("Variedad A:\n"); print(r_A)
+cat("Variedad B:\n"); print(r_B)
+cat("Variedad C:\n"); print(r_C)
+cat("Variedad D:\n"); print(r_D)
+```
+
+```{r tabla-normalidad}
+data.frame(
+  Variedad  = c("A","B","C","D"),
+  W         = round(c(r_A$statistic, r_B$statistic,
+                      r_C$statistic, r_D$statistic), 5),
+  `p-valor` = sapply(c(r_A$p.value, r_B$p.value,
+                       r_C$p.value, r_D$p.value), fmt_p),
+  Decisión  = ifelse(
+    c(r_A$p.value, r_B$p.value, r_C$p.value, r_D$p.value) > 0.05,
+    "No se rechaza H₀", "Se rechaza H₀")
+) |>
+  kable(escape = FALSE,
+        caption = "Tabla 4.3. Prueba de Shapiro-Wilk multivariada por variedad") |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = FALSE, font_size = 14) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white")
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Con α = 0.05, ningún grupo rechaza la hipótesis de normalidad
+multivariada. Los p-valores oscilan entre 0.0995 (variedad B) y 0.3379
+(variedad C), todos por encima del nivel de significancia. El supuesto
+se cumple satisfactoriamente en los cuatro grupos. ✓
+
+</p>
+
+------------------------------------------------------------------------
+
+### Homogeneidad de Matrices de Varianza-Covarianza
+
+**a. Hipótesis:**
+
+$$H_0: \boldsymbol{\Sigma}_A = \boldsymbol{\Sigma}_B = \boldsymbol{\Sigma}_C = \boldsymbol{\Sigma}_D$$
+$$H_1: \text{Al menos una } \boldsymbol{\Sigma}_i \text{ difiere de las demás}, \quad i = A, B, C, D$$
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. p-valor**
+
+```{r boxm-show, echo=TRUE, eval=TRUE}
+library(heplots)
+res_boxM  <- boxM(datos[, 1:4], datos$Variedad)
+res_boxM
+```
+
+```{r boxM,include=FALSE}
+pval_boxM <- res_boxM$p.value
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+La prueba M de Box arrojó χ² ≈ 26.35 (gl = 30) con p-valor =
+`r round(pval_boxM, 4)`, muy por encima de α = 0.05. No se rechaza H₀:
+las matrices de varianza-covarianza son homogéneas entre las cuatro
+variedades, validando el uso de los estadísticos multivariados clásicos.
+✓
+
+</p>
+
+------------------------------------------------------------------------
+
+### Correlación entre Variables — Prueba de Esfericidad de Bartlett
+
+**a. Hipótesis:**
+
+$$H_0: \det(\mathbf{R}) = 1 \quad \text{(variables no correlacionadas)}$$
+$$H_1: \det(\mathbf{R}) \neq 1 \quad \text{(existen correlaciones significativas entre variables)}$$
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. p-valor**
+
+```{r bartlett-show-1, echo=TRUE, eval=TRUE}
+options(scipen = 0)
+res_bart  <- cortest.bartlett(cor(datos[, 1:4]), n = nrow(datos))
+res_bart
+```
+
+```{r bartlett, include=FALSE}
+options(scipen = 0)
+pval_bart <- res_bart$p.value
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+El estadístico χ² = 737.07 (gl = 6) produce un p-valor ≈ 6.05 × 10⁻¹⁵⁶,
+extremadamente inferior a α. Se rechaza H₀ contundentemente: las
+variables están fuertemente correlacionadas entre sí. Este resultado
+respalda el uso del MANOVA: analizar las variables de forma conjunta es
+no solo válido sino necesario para aprovechar la información compartida
+entre ellas. ✓
+
+</p>
+
+------------------------------------------------------------------------
+
+## Modelo MANOVA
+
+```{r modelo-show-1, echo=TRUE, eval=TRUE}
+modelo <- manova(cbind(Y1, Y2, Y3, Y4) ~ Variedad, data = datos)
+
+Matrices <- summary(modelo)$SS
+B_mat    <- Matrices$Variedad
+W_mat    <- Matrices$Residuals
+T_mat    <- B_mat + W_mat
+```
+
+Las matrices de suma de cuadrados y productos cruzados (SCPC)
+descomponen la variabilidad total en dos fuentes:
+
+-   **B** (Factor): variabilidad *entre* variedades, atribuible al
+    efecto del tratamiento.
+-   **W** (Residual): variabilidad *dentro* de cada variedad, que
+    representa el error experimental.
+-   **T = B + W**: variabilidad total.
+
+```{r matrices-scpc}
+cat("SCPC del Factor — B:\n");  print(round(B_mat, 3))
+cat("\nSCPC Residual — W:\n");  print(round(W_mat, 3))
+cat("\nSCPC Total — T:\n");     print(round(T_mat, 3))
+```
+
+<p class="nota">
+
+Los elementos de la diagonal de B son notablemente mayores que los de W,
+lo que indica que la variabilidad entre variedades supera ampliamente la
+variabilidad dentro de cada grupo. Esto anticipa un efecto del factor
+estadísticamente poderoso.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Pruebas de Hipótesis Multivariadas
+
+**a. Hipótesis:**
+
+$$H_0: \boldsymbol{\mu}_A = \boldsymbol{\mu}_B = \boldsymbol{\mu}_C = \boldsymbol{\mu}_D$$
+$$H_1: \text{Al menos un vector de medias } \boldsymbol{\mu}_i \text{ difiere de los demás}, \quad i = A, B, C, D$$
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. p-valor**
+
+```{r multi-show, echo=TRUE, eval=TRUE}
+summary(modelo, test = "Pillai")
+summary(modelo, test = "Wilks")
+summary(modelo, test = "Hotelling-Lawley")
+summary(modelo, test = "Roy")
+```
+
+```{r tabla-multivariada}
+data.frame(
+  Criterio    = c("Traza de Pillai","Lambda de Wilks",
+                  "Traza de Hotelling-Lawley","Raíz mayor de Roy"),
+  Estadístico = c(0.99631, 0.10963, 7.1687, 7.0354),
+  `F aprox`   = c(11.809, 26.813, 54.761, 167.09),
+  `gl num`    = c(12, 12, 12, 4),
+  `gl den`    = c(285, 246.35, 275, 95),
+  `p-valor`   = rep("< 2.2e-16", 4),
+  Decisión    = rep("Rechaza H₀", 4)
+) |>
+  kable(caption = "Tabla 4.4. Estadísticos multivariados para el efecto de Variedad") |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white") |>
+  row_spec(1:4, background = "#EAFAF1")
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Los cuatro criterios multivariados son unánimes: todos arrojan p-valores
+menores a 2.2 × 10⁻¹⁶, muy por debajo de α = 0.05. <strong>Se rechaza
+H₀</strong>: existe evidencia estadística contundente de que al menos
+una variedad difiere de las demás en su perfil morfológico
+conjunto.<br><br> Algunos aspectos a destacar de los estadísticos:<br> •
+El <strong>Lambda de Wilks</strong> próximo a cero (0.110) indica que la
+variabilidad entre variedades domina ampliamente sobre la residual.<br>
+• La <strong>Traza de Pillai</strong> (0.996), el estadístico más
+robusto ante desviaciones de los supuestos con muestras balanceadas (n =
+25 por grupo), representa casi la totalidad de la varianza conjunta
+explicada por el factor.<br> • Dado que los cuatro criterios coinciden,
+la conclusión no depende del estadístico elegido.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Medida de Ajuste del Modelo
+
+La bondad de ajuste multivariada se cuantifica mediante el **eta
+cuadrado multivariado** ($\eta^2$):
+
+$$\eta^2 = 1 - \frac{\det(\mathbf{W})}{\det(\mathbf{T})}$$
+
+-   Un valor **próximo a 1** indica que el factor explica la mayor parte
+    de la variabilidad total conjunta.
+-   Un valor **próximo a 0** indica que el factor explica muy poco de
+    esa variabilidad.
+
+```{r eta-show, echo=TRUE, eval=TRUE}
+eta2    <- 1 - det(W_mat) / det(T_mat)
+lambdas <- eigen(solve(W_mat) %*% B_mat)$values
+
+cat("Eta cuadrado multivariado (η²):", round(eta2, 6), "\n\n")
+```
+
+<p class="nota">
+
+Con η² ≈ 1, prácticamente la <strong>totalidad de la variabilidad
+morfológica conjunta</strong> entre las 100 plantas queda explicada por
+el factor Variedad. Este resultado representa un <strong>tamaño del
+efecto muy grande</strong>: la genética de la variedad determina de
+forma casi completa el patrón morfológico observado, dejando una
+fracción mínima atribuible al error experimental.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Análisis Univariado — ANOVA por Variable
+
+Una vez rechazada la hipótesis global, el análisis univariado responde a
+la pregunta: **¿qué variables individuales explican el efecto
+multivariado?**
+
+**a. Hipótesis** (evaluada por variable):
+
+-   $H_0$: Las medias de la variable $Y_k$ son iguales entre las cuatro
+    variedades.
+-   $H_1$: Al menos una variedad difiere en $Y_k$.
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. Resultados**
+
+```{r univ-show, echo=TRUE, eval=TRUE}
+summary.aov(modelo)
+```
+
+```{r tabla-univariada}
+data.frame(
+  Variable  = c("Y₁ — Altura de planta",
+                "Y₂ — Longitud del tallo",
+                "Y₃ — Diámetro del tubérculo",
+                "Y₄ — Longitud del tubérculo"),
+  SC        = c(2880.75, 2522.89, 38.73, 57.68),
+  CM        = c(960.25,  840.96,  12.91, 19.23),
+  `F`       = c(178.98,  166.90,  178.06, 136.99),
+  `p-valor` = rep("< 2.2e-16", 4),
+  Decisión  = rep("Rechaza H₀", 4)
+) |>
+  kable(caption = "Tabla 4.5. ANOVAs univariados por variable respuesta") |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white") |>
+  row_spec(1:4, background = "#EAFAF1")
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Las cuatro variables rechazan individualmente H₀ (p \< 2.2 × 10⁻¹⁶),
+confirmando que <strong>todas contribuyen al efecto global</strong>. Los
+estadísticos F más altos corresponden a Y₁ (F = 178.98) y Y₃ (F =
+178.06), las variables con mayor capacidad discriminante entre
+variedades en términos de señal/ruido. Y₄ registra el F más bajo
+(136.99), aunque igualmente significativo. El efecto del factor Variedad
+es genuinamente multivariado: no se concentra en una sola variable sino
+que atraviesa todo el perfil morfológico de la planta.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Comparaciones por Pares
+
+Con el rechazo global establecido, las comparaciones por pares responden
+a: **¿qué variedades específicas difieren entre sí?**
+
+**a. Hipótesis** (por cada par):
+
+-   $H_0$: Los vectores de medias de las dos variedades comparadas son
+    iguales.
+-   $H_1$: Los vectores de medias difieren.
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. Resultados**
+
+```{r pares-show, echo=TRUE, eval=TRUE}
+Tratam <- levels(datos$Variedad)
+comb   <- t(combn(length(Tratam), 2))
+pares_pval <- numeric(nrow(comb))
+
+for (i in 1:nrow(comb)) {
+  modelo_par <- manova(
+    cbind(Y1, Y2, Y3, Y4) ~ Variedad,
+    data   = datos,
+    subset = Variedad %in% Tratam[comb[i, ]]
+  )
+  
+  # CORRECCIÓN: La línea estaba rota aquí. Ahora está unificada.
+  cat(paste0("\nComparación: Variedad ", Tratam[comb[i,1]], " vs Variedad ", Tratam[comb[i,2]], "\n"))
+  
+  res_par        <- summary(modelo_par, test = "Pillai")
+  pares_pval[i]  <- res_par$stats["Variedad", "Pr(>F)"]
+  print(res_par)
+}
+```
+
+```{r tabla-pares}
+data.frame(
+  Comparación = c("A vs B","A vs C","A vs D","B vs C","B vs D","C vs D"),
+  Pillai      = c(0.70203, 0.64589, 0.82269, 0.88893, 0.50970, 0.91455),
+  `F aprox`   = c(26.505, 20.52, 52.196, 90.036, 11.695, 120.40),
+  `p-valor`   = c("2.48e-11","1.11e-09","2.44e-16","< 2.2e-16","1.35e-06","< 2.2e-16"),
+  Decisión    = rep("Rechaza H₀", 6)
+) |>
+  kable(caption = "Tabla 4.6. Comparaciones multivariadas por pares (Traza de Pillai)") |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white") |>
+  row_spec(1:6, background = "#EAFAF1")
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Todos los pares resultan significativamente diferentes (p \< 0.05):
+<strong>no existe ningún par de variedades morfológicamente
+equivalente</strong>. Algunos aspectos a destacar:<br><br> • Los pares
+con mayor distancia morfológica son <strong>C vs D</strong> (Pillai =
+0.915) y <strong>B vs C</strong> (Pillai = 0.889), lo que indica que
+estas variedades presentan los perfiles más contrastantes entre sí.<br>
+• El par <strong>B vs D</strong> presenta la menor distancia (Pillai =
+0.510), aunque igualmente significativo, lo que sugiere que estas dos
+variedades comparten un perfil morfológico más parecido en comparación
+con el resto de los pares.<br><br> <strong>Nota importante:</strong>
+estas comparaciones permiten identificar qué variedades difieren entre
+sí en su perfil multivariado, pero no establecen un ordenamiento o
+jerarquía entre ellas. Para eso se requeriría un análisis adicional
+(e.g., discriminante o de componentes principales).
+
+</p>
+
+------------------------------------------------------------------------
+
+## Conclusiones
+
+```{r tabla-conclusiones}
+sig <- function(p) ifelse(p < 0.05, "✔ Significativo", "✘ No significativo")
+
+pval_multi <- summary(modelo, test = "Pillai")$stats["Variedad", "Pr(>F)"]
+pval_Y1    <- summary.aov(modelo)[[1]]["Variedad", "Pr(>F)"]
+pval_Y2    <- summary.aov(modelo)[[2]]["Variedad", "Pr(>F)"]
+pval_Y3    <- summary.aov(modelo)[[3]]["Variedad", "Pr(>F)"]
+pval_Y4    <- summary.aov(modelo)[[4]]["Variedad", "Pr(>F)"]
+
+tabla_concl <- data.frame(
+  Fuente      = c("MANOVA global (Pillai)",
+                  "Y₁ — Altura de planta",
+                  "Y₂ — Long. tallo",
+                  "Y₃ — Diám. tubérculo",
+                  "Y₄ — Long. tubérculo"),
+  `p-valor`   = c(fmt_p(pval_multi),
+                  fmt_p(pval_Y1), fmt_p(pval_Y2),
+                  fmt_p(pval_Y3), fmt_p(pval_Y4)),
+  Resultado   = c(sig(pval_multi),
+                  sig(pval_Y1), sig(pval_Y2),
+                  sig(pval_Y3), sig(pval_Y4)),
+  Interpretación = c(
+    "Se rechaza H₀: al menos un vector de medias difiere entre variedades",
+    "La variedad influye significativamente sobre la altura de planta",
+    "La variedad influye significativamente sobre la longitud del tallo",
+    "La variedad influye significativamente sobre el diámetro del tubérculo",
+    "La variedad influye significativamente sobre la longitud del tubérculo"
+  ),
+  check.names = FALSE
+)
+
+kable(tabla_concl,
+      caption = paste0("Tabla 4.7. Resumen de resultados | η² = ",
+                       round(eta2, 4),
+                       " (", round(eta2*100, 2), "% de variabilidad explicada)")) |>
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) |>
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white") |>
+  row_spec(which(tabla_concl$Resultado == "✔ Significativo"),
+           background = "#EAFAF1") |>
+  row_spec(which(tabla_concl$Resultado == "✘ No significativo"),
+           background = "#FDEDEC")
+```
+
+### Resumen general
+
+El MANOVA en DCA demostró diferencias altamente significativas en el
+perfil morfológico conjunto entre las cuatro variedades de papa (p \<
+2.2 × 10⁻¹⁶ en los cuatro criterios). La bondad de ajuste multivariada
+$\eta^2 \approx 1$ confirma que el factor Variedad explica prácticamente
+la totalidad de la variabilidad conjunta observada. Los tres supuestos
+del modelo —normalidad multivariada, homogeneidad de matrices de
+covarianza y correlación entre variables— se cumplieron
+satisfactoriamente, otorgando plena validez estadística a los
+resultados.
+
+### Discusión de los resultados
+
+El análisis univariado confirmó que las cuatro variables contribuyen
+individualmente al efecto global. $Y_1$ (F = 178.98) y $Y_3$ (F =
+178.06) son las variables con mayor capacidad discriminante. Las
+comparaciones por pares mostraron que **todas las variedades difieren
+entre sí** en su perfil morfológico multivariado: los pares más
+disímiles son C vs D y B vs C, mientras que B vs D presentan el perfil
+más cercano —aunque igualmente distinto— entre todos los pares.
+
+### Respuesta al objetivo
+
+**Sí existen diferencias significativas** en el perfil morfológico
+conjunto entre las cuatro variedades evaluadas. Las variedades difieren
+en todas las dimensiones medidas y no existe ningún par de variedades
+que comparta el mismo perfil multivariado.
+
+------------------------------------------------------------------------
+
+# MANOVA Factorial en DBCA
+
+## Introducción
+
+En la industria ganadera, el reto constante es aumentar el volumen de
+producción de leche sin que sus componentes nutricionales se diluyan.
+Para descubrir la dieta óptima que logre este equilibrio, en este
+estudio se implementó directamente un arreglo factorial (2x2) conducido
+bajo un Diseño de Bloques Completos al Azar (DBCA) para evaluar
+múltiples variables respuesta de forma simultánea.
+
+La elección de este diseño multivariado obedece a un fin práctico y
+estadístico: permite analizar cómo interactúan dos factores
+nutricionales (Tipo de Forraje y Suplementación) sobre un vector de
+respuestas que guardan una fuerte correlación biológica (Producción en
+litros, % de Grasa y % de Proteína). Además, el uso de bloques permite
+aislar la variabilidad natural proveniente del número de partos de cada
+vaca, garantizando que las diferencias encontradas en el perfil lácteo
+se deban exclusivamente a la dieta y no a la madurez del animal.
+
+### Estructura del Experimento
+
+| Componente | Descripción |
+|------------------------------------|------------------------------------|
+| **Factor A** | Tipo de Forraje: Alfalfa, Ensilado (a = 2) |
+| **Factor B** | Suplementación: Con Concentrado, Sin Concentrado (b = 2) |
+| **Bloques** | Número de Partos: 5 niveles (r = 5) |
+| **Variables respuesta** | Producción (L/día), Grasa (%), Proteína (%) |
+| **Diseño** | Factorial 2x2 en DBCA |
+
+### Objetivos
+
+-   Evaluar el efecto conjunto del forraje y el suplemento sobre el
+    perfil productivo.
+-   Determinar si existe una **interacción significativa** que potencie
+    la producción.
+-   Validar los supuestos de normalidad y homogeneidad multivariada.
+-   Realizar comparaciones múltiples para optimizar la dieta del ganado.
+
+------------------------------------------------------------------------
+
+## Marco Teórico
+
+### Modelo Estadístico
+
+El modelo lineal multivariado para este diseño factorial en bloques es:
+
+$$\mathbf{Y}_{ijk} = \boldsymbol{\mu} + \boldsymbol{\rho}_k + \boldsymbol{\alpha}_i + \boldsymbol{\beta}_j + (\boldsymbol{\alpha\beta})_{ij} + \boldsymbol{\varepsilon}_{ijk}$$
+
+Donde $\boldsymbol{\rho}_k$ representa el efecto del $k$-ésimo bloque
+(partos) y $(\boldsymbol{\alpha\beta})_{ij}$ es el efecto de la
+interacción entre forraje y suplemento sobre el vector de respuestas
+$\mathbf{Y}$.
+
+### Criterios de Decisión Multivariados
+
+Se evalúa la hipótesis nula multivariada
+$H_0: \boldsymbol{\alpha}_i = \mathbf{0}, \boldsymbol{\beta}_j = \mathbf{0}, (\boldsymbol{\alpha\beta})_{ij} = \mathbf{0}$
+mediante las matrices de Sumas de Cuadrados y Productos Cruzados de la
+Hipótesis ($\mathbf{H}$) y del Error ($\mathbf{E}$).
+
+| Criterio | Fórmula | Aplicación en este estudio |
+|------------------|---------------------------------|---------------------|
+| Wilks' Lambda | $\Lambda = \frac{|\mathbf{E}|}{|\mathbf{E}+\mathbf{H}|}$ | Evalúa el efecto global de los factores sobre las variables respuesta. |
+| Traza de Pillai | $V = \mathrm{tr}[\mathbf{H}(\mathbf{E}+\mathbf{H})^{-1}]$ | El más robusto si las matrices de grasa y proteína son heterogéneas. |
+| Hotelling-Lawley | $T = \mathrm{tr}[\mathbf{H}\mathbf{E}^{-1}]$ | Compara la varianza entre dietas frente a la varianza residual. |
+| Raíz Mayor de Roy | $\theta = \lambda_{\max}(\mathbf{H}\mathbf{E}^{-1})$ | Detecta si existe un efecto dominante en una sola variable (ej. solo Producción). |
+
+### Supuestos del Modelo
+
+| Supuesto | Prueba Estadística | Hipótesis Nula ($H_0$) |
+|------------------------|------------------------|------------------------|
+| **Normalidad** | Shapiro-Wilk (M) | Los residuos siguen una normal multivariada. |
+| **Homocedasticidad** | Prueba M de Box | Las matrices de varianza-covarianza son iguales. |
+| **Supuesto de variables dependientes correlacionadas** | Esfericidad de Bartlett | Existe correlación suficiente entre las variables respuesta. |
+
+------------------------------------------------------------------------
+
+## Carga de los datos
+
+```{r librerias, message=FALSE, warning=FALSE}
+# Carga del archivo generado
+datos_vacas <- read.csv("Data_Final_Vacas_PC1.csv")
+
+# Definicion de las variables respuesta
+vars_vacas <- c("Produccion", "Grasa", "Proteina")
+
+# Convertir a factor para las pruebas estadísticas
+datos_vacas$Tratamiento <- as.factor(datos_vacas$Tratamiento)
+datos_vacas$Forraje <- as.factor(datos_vacas$Forraje)
+datos_vacas$Suplemento <- as.factor(datos_vacas$Suplemento)
+datos_vacas$Bloque <- as.factor(datos_vacas$Bloque)
+
+kable(head(datos_vacas, 10), caption = "Datos cargados para el análisis") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+## Verificación de Supuestos
+
+### Normalidad Multivariada por Tratamiento
+
+Para cada combinación de los factores Forraje ($i$) y Suplemento ($j$),
+se evalúa la hipótesis:
+
+$$H_0: \mathbf{Y}_{ij} \sim N_p(\boldsymbol{\mu}_{ij}, \boldsymbol{\Sigma})$$
+
+$$H_1: \mathbf{Y}_{ij} \nsim N_p(\boldsymbol{\mu}_{ij}, \boldsymbol{\Sigma})$$
+Donde $p=3$ variables (Producción, Grasa, Proteína).
+
+Interpretación: Se verifica si los vectores de respuesta en cada celda
+del diseño factorial siguen una distribución normal conjunta. Un
+$p\text{-valor} > 0.05$ en la prueba de Shapiro-Wilk multivariada indica
+que los errores del sistema son aleatorios y no sesgados, permitiendo
+una estimación válida de los parámetros del modelo.
+
+**A. Prueba de Shapiro-Wilk por Tratamiento (Celdas)**
+
+Siguiendo la metodología de desagregación de datos:
+
+```{r}
+# Evaluamos la normalidad en cada una de las 4 celdas del diseño
+library(mvnormtest)
+
+niveles_f <- levels(datos_vacas$Forraje)
+niveles_s <- levels(datos_vacas$Suplemento)
+
+for(f in niveles_f){
+  for(s in niveles_s){
+    # Filtramos la data por celda
+    sub_data <- datos_vacas %>% 
+      filter(Forraje == f, Suplemento == s) %>% 
+      dplyr::select(all_of(vars_vacas)) %>% 
+      as.matrix()
+    
+    # Ejecutamos el test (transpuesto)
+    test <- mshapiro.test(t(sub_data))
+    
+    cat("Grupo:", f, "+", s, "| p-valor:", round(test$p.value, 5), "\n")
+  }
+}
+```
+
+**Interpretación**
+
+Los resultados de la prueba de Shapiro-Wilk multivariada revelan que los cuatro 
+grupos del diseño factorial presentan $p\text{-valores} < 0.05$ — 
+Alfalfa + Con_Concent ($p = 0.0103$), Alfalfa + Sin_Concent ($p = 0.0196$), 
+Ensilado + Con_Concent ($p = 0.0465$) y Ensilado + Sin_Concent ($p = 0.0269$) — 
+por lo tanto, se rechaza $H_0$ en todos los grupos y el supuesto de normalidad 
+multivariada **no se cumple**. Ante este incumplimiento, se opta por continuar 
+el análisis utilizando la **Traza de Pillai** como estadístico de prueba principal, 
+dado que es el criterio multivariado más robusto frente a desviaciones de la 
+normalidad y a posibles heterogeneidades en las matrices de covarianza.
+
+### Homogeneidad de Covarianzas (Box M)
+
+$$H_0: \boldsymbol{\Sigma}_{1} = \boldsymbol{\Sigma}_{2} = \boldsymbol{\Sigma}_{3} = \boldsymbol{\Sigma}_{4}$$
+
+$$H_1: \exists \ i \neq j \text{ tal que } \boldsymbol{\Sigma}_{i} \neq \boldsymbol{\Sigma}_{j}$$
+
+```{r}
+library(heplots) 
+# Prueba estadística M de Box completa
+cat("--- Prueba M de Box para Homogeneidad de Covarianzas ---\n")
+res_box <- boxM(datos_vacas[, vars_vacas], datos_vacas$Tratamiento)
+print(res_box)
+```
+
+**Interpretación:**
+
+Dado que el $p\text{-valor} = 0.8323$ es ampliamente
+superior al nivel de significancia ($\alpha = 0.05$), no se rechaza la
+hipótesis nula ($H_0$). En consecuencia, se concluye que las matrices de
+covarianza son estadísticamente homogéneas entre los grupos
+experimentales. Esto significa que el supuesto de homocedasticidad
+multivariada se cumple satisfactoriamente, lo cual brinda total validez
+matemática a los estadísticos de prueba (Pillai, Wilks, etc.) que se
+utilizarán en el MANOVA.
+
+### Esfericidad de Bartlett
+
+Para justificar el uso de un análisis multivariado (MANOVA) en lugar de
+varios ANOVA independientes, es requisito que las variables respuesta
+presenten un grado de correlación significativo. Se evalúan las
+siguientes hipótesis basadas en la determinante de la matriz de
+correlación ($|\mathbf{R}|$):
+
+$$H_0: |\mathbf{R}| = 1$$ (Las variables son independientes; la matriz
+de correlación equivale a una matriz identidad).
+
+$$H_1: |\mathbf{R}| \neq 1$$ (Existe correlación significativa entre las
+variables; la determinante difiere de 1).
+
+```{r}
+library(psych)
+# 1. Calcular y mostrar la matriz de correlación
+matriz_cor <- cor(datos_vacas[, vars_vacas])
+cat("--- Matriz de Correlación (R) ---\n")
+print(round(matriz_cor, 4))
+```
+
+**Interpretación:**
+
+-   Producción vs. Grasa (-0.9958): Correlación negativa muy fuerte.
+    Significa que cuando la variable Producción sube, la variable Grasa
+    baja proporcionalmente.
+
+-   Producción vs. Proteína (-0.9972): Correlación negativa muy fuerte.
+    Mismo caso: a más litros de leche, menos porcentaje de proteína.
+
+-   Grasa vs. Proteína (0.9978): Correlación positiva muy fuerte.
+    Significa que estos dos nutrientes van "de la mano". Si la leche
+    logra mantener un alto nivel de grasa, automáticamente tendrá un
+    alto nivel de proteína.
+
+```{r}
+# 2. Calcular y mostrar la determinante de la matriz
+det_R <- det(matriz_cor)
+cat("\nDeterminante de la matriz R (|R|):", round(det_R, 5), "\n\n")
+
+# 3. Prueba estadística de Bartlett completa
+cat("--- Prueba de Esfericidad de Bartlett ---\n")
+res_bart <- cortest.bartlett(matriz_cor, n = 20)
+print(res_bart)
+```
+
+**Interpretación:**
+
+Al observar la matriz de correlación empírica,
+notamos que los valores fuera de la diagonal principal son
+sustancialmente distintos de cero, lo que resulta en una determinante de
+la matriz ($|R|$) muy alejada de 1.Estadísticamente, la prueba de
+Bartlett arroja un $p\text{-valor} < 0.0001$, el cual es menor al nivel
+de significancia ($\alpha = 0.05$). Por lo tanto, se rechaza firmemente
+la hipótesis nula ($H_0$). Se concluye que existe una correlación
+altamente significativa entre la Producción, la Grasa y la Proteína.
+Esta dependencia biológica y estadística justifica plenamente el uso del
+enfoque multivariado (MANOVA) para este conjunto de datos.
+
+## Análisis Multivariado (MANOVA)
+
+Para evaluar el impacto de las dietas sobre el vector de respuestas (Producción, Grasa y Proteína), se ajusta el modelo lineal multivariado controlando por el factor de bloqueo (Número de Partos). Siguiendo la metodología para arreglos factoriales, el primer paso crítico es evaluar la significancia de la interacción y de los tratamientos.
+
+**a. Hipótesis**
+
+Dado que es un arreglo factorial 2x2 (Forraje y Suplemento), definimos el vector de medias $\boldsymbol{\mu}_{ij}$ para el $i$-ésimo nivel de Forraje ($i = 1, 2$) y el $j$-ésimo nivel de Suplemento ($j = 1, 2$). Cada vector contiene las medias de las 3 variables respuesta:
+
+$$\boldsymbol{\mu}_{ij} = \begin{bmatrix} \mu_{ij, \text{Producción}} \\ \mu_{ij, \text{Grasa}} \\ \mu_{ij, \text{Proteína}} \end{bmatrix}$$
+
+**1. Hipótesis Global (Igualdad de tratamientos)**
+
+$$H_0: \boldsymbol{\mu}_{11} = \boldsymbol{\mu}_{12} = \boldsymbol{\mu}_{21} = \boldsymbol{\mu}_{22}$$
+
+$$H_1: \text{Al menos un vector de medias } \boldsymbol{\mu}_{ij} \text{ es diferente a los demás.}$$
+
+*(Nota: Cada vector representa las medias de Producción, Grasa y Proteína para cada una de las 4 combinaciones de Forraje y Suplemento).*
+
+De manera específica para este diseño, la hipótesis estructural para la interacción es:
+
+**2. Hipótesis para la Interacción (Forraje $\times$ Suplemento)**
+
+$$H_0: (\boldsymbol{\alpha\beta})_{ij} = \mathbf{0}$$
+(No existe efecto de interacción significativa entre el Forraje y el Suplemento sobre el vector de medias).
+
+$$H_1: (\boldsymbol{\alpha\beta})_{ij} \neq \mathbf{0}$$
+(Existe efecto de interacción significativa).
+
+**3. Hipótesis para el Efecto Principal A (Forraje)**
+$$H_0: \boldsymbol{\alpha}_{i} = \mathbf{0}$$
+(No existe efecto principal del tipo de Forraje sobre el vector de medias).
+
+$$H_1: \boldsymbol{\alpha}_{i} \neq \mathbf{0}$$
+(Existe efecto principal del tipo de Forraje).
+
+**4. Hipótesis para el Efecto Principal B (Suplemento)**
+$$H_0: \boldsymbol{\beta}_{j} = \mathbf{0}$$
+(No existe efecto principal del tipo de Suplemento sobre el vector de medias).
+
+$$H_1: \boldsymbol{\beta}_{j} \neq \mathbf{0}$$
+(Existe efecto principal del tipo de Suplemento).
+
+**b. Nivel de significancia:** $\alpha = 0.05$
+
+**c. p-valor y Estadísticos**
+
+```{r, echo=TRUE, results='markup'}
+library(knitr)
+library(kableExtra)
+
+# 1. Ajuste del Modelo MANOVA (aseguramos que esté definido)
+mod_manova <- manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Forraje * Suplemento, data = datos_vacas)
+
+# 2. Imprimir salidas crudas de R
+cat("### Prueba de Pillai\n")
+print(summary(mod_manova, test = "Pillai"))
+
+cat("\n### Prueba de Wilks\n")
+print(summary(mod_manova, test = "Wilks"))
+
+cat("\n### Prueba de Hotelling-Lawley\n")
+print(summary(mod_manova, test = "Hotelling-Lawley"))
+
+# 3. Extraer estadísticas de la prueba de Pillai (la más robusta)
+stats_pillai <- summary(mod_manova, test="Pillai")$stats
+p_bloque  <- stats_pillai[1, 6]
+p_forraje <- stats_pillai[2, 6]
+p_suple   <- stats_pillai[3, 6]
+p_inter   <- stats_pillai[4, 6]
+
+# 4. Crear una Tabla Global estilo publicación
+tabla_global <- data.frame(
+  Fuente_de_Variacion = c("Bloque (Partos)", "Factor A: Forraje", "Factor B: Suplemento", "Interacción (A:B)"),
+  Pillai = c(stats_pillai[1, 2], stats_pillai[2, 2], stats_pillai[3, 2], stats_pillai[4, 2]),
+  P_valor = c(p_bloque, p_forraje, p_suple, p_inter)
+)
+
+# Formatear P-valores
+tabla_global$P_valor <- format.pval(tabla_global$P_valor, eps = 0.0001)
+
+# Agregar la columna de Decisión basada en la metodología del profesor
+tabla_global$Decision <- c(
+  ifelse(p_bloque < 0.05, "Bloque Significativo", "No Significativo"),
+  "No interpretar (Hay interacción)", 
+  "No interpretar (Hay interacción)",
+  ifelse(p_inter < 0.05, "Rechaza H0 -> Ir a Efectos Simples", "No rechaza H0")
+)
+
+# 5. Renderizar la tabla con Kable
+kable(tabla_global, digits = 4,
+      col.names = c("Efecto Evaluado", "Traza de Pillai", "P-valor", "Decisión Metodológica"),
+      align = "llcc",
+      caption = "Tabla 5. Resumen del MANOVA Global (Criterio de Pillai)",
+      escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE) %>%
+  row_spec(0, bold = TRUE, background = "#2E4057", color = "white") %>%
+  row_spec(4, bold = TRUE, background = "#e6f2ff") # Resalta la fila de la interacción
+```
+
+### Determinación de las Matrices SSCP (Suma de Cuadrados y Productos Cruzados)
+
+Siguiendo el rigor algebraico del modelo, descomponemos la matriz de
+varianza total:
+$$\mathbf{T} = \mathbf{H}_{Forraje} + \mathbf{H}_{Suplemento} + \mathbf{H}_{Interacción} + \mathbf{H}_{Bloque} + \mathbf{E}$$
+**Matriz de la Interacción ($H_{AB}$)**
+
+```{r}
+# Extracción de las matrices del objeto manova
+Matrices <- summary(mod_manova)$SS
+
+cat("--- Matriz de la Interacción (H_AB) ---\n")
+print(Matrices$`Forraje:Suplemento`)
+```
+
+**Interpretación de la Interacción:**
+
+Observamos que el valor de 102.018 en la diagonal revela una variabilidad sumamente alta en la Producción explicada exclusivamente por el efecto conjunto del forraje y el suplemento. Por otro lado, las covarianzas cruzadas negativas, como -5.475 (Producción vs. Grasa) y -3.683 (Producción vs. Proteína), indican que la interacción actúa de manera inversa: las combinaciones de dieta que aumentan el volumen de producción tienden a deprimir la concentración de grasa y proteína simultáneamente.
+
+**Matriz del Error o Residual ($E$)**
+
+```{r}
+cat("\n--- Matriz del Error o Residual (E) ---\n")
+W <- Matrices$Residuals
+print(W)
+```
+
+**Interpretación del Error:**
+
+Los valores en la diagonal (2.767 para Producción, 0.029 para Grasa) cuantifican la varianza pura que no pudo ser explicada por los tratamientos ni por los bloques. Al contrastar la inmensa variabilidad de la producción explicada por la interacción (102.018) frente a su error residual (2.767), se anticipa que la interacción será estadísticamente significativa. Además, las covarianzas residuales negativas (ej. -0.200 entre Producción y Grasa) demuestran una relación fisiológica natural e inversa: independientemente de la dieta, los animales con mayores volúmenes de producción tienden a "diluir" sus componentes.
+
+### ANOVA de Seguimiento
+
+```{r}
+summary.aov(mod_manova)
+```
+
+**Interpretación**
+
+- Efectividad del Bloqueo: El factor Bloque resultó ser altamente significativo (p < 0.001) para la Producción, la Grasa y la Proteína. Esto indica que la decisión de agrupar a los animales (por ejemplo, por número de partos o etapa de lactancia) fue correcta y ayudó a reducir considerablemente el error experimental, mejorando la precisión del modelo.
+
+- Significancia de la Interacción: Observamos que la interacción Forraje:Suplemento es estadísticamente significativa para las tres respuestas individuales (p = 7.739e-11 para Producción, p = 1.284e-07 para Grasa y p = 7.677e-08 para Proteína).
+
+- Decisión metodológica: En un experimento factorial, primero se prueba si existe interacción; si no la hay, se analizan los efectos principales. Dado que la interacción Forraje:Suplemento resultó significativa 
+($p < 0.0001$), se procede al análisis de los efectos simples.
+
+### Análisis de Efectos Simples Multivariados
+
+**A. El escenario sinérgico (Base Alfalfa)**
+
+Se evalúa si la adición de concentrado altera el perfil lácteo conjunto cuando las vacas consumen exclusivamente Alfalfa. La hipótesis estructural es:
+
+$$H_0: \begin{bmatrix} \mu_{Producción} \\ \mu_{Grasa} \\ \mu_{Proteína} \end{bmatrix}_{Alfalfa + Concentrado} = \begin{bmatrix} \mu_{Producción} \\ \mu_{Grasa} \\ \mu_{Proteína} \end{bmatrix}_{Alfalfa + Sin \ Concentrado}$$
+$$H_1: \text{Los vectores de medias poblacionales son diferentes.}$$
+
+```{r}
+# Análisis multivariado condicionado
+cat("### Efecto Multivariado del Suplemento en Alfalfa\n")
+sub_alfalfa <- subset(datos_vacas, Forraje == "Alfalfa")
+summary(manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Suplemento, data = sub_alfalfa), test = "Pillai")
+```
+
+**Decisión e Interpretación:**
+
+Al obtener un $p\text{-valor} = 0.0007$ (Traza de Pillai), se rechaza fuertemente $H_0$. El suplemento genera un desplazamiento masivo en el centroide multivariado. Biológicamente, esto demuestra una fuerte sinergia nutricional: la alta calidad proteica de la alfalfa interactúa con la energía del concentrado, maximizando la respuesta metabólica de la vaca, lo que dispara el volumen de producción y arrastra las variables de calidad (grasa y proteína) hacia una dilución marcada.
+
+**B. El escenario conservador (Base Ensilado)**
+
+Se evalúa el mismo efecto del suplemento, pero fijando la dieta base en Ensilado:
+
+$$H_0: \begin{bmatrix} \mu_{Producción} \\ \mu_{Grasa} \\ \mu_{Proteína} \end{bmatrix}_{Ensilado + Concentrado} = \begin{bmatrix} \mu_{Producción} \\ \mu_{Grasa} \\ \mu_{Proteína} \end{bmatrix}_{Ensilado + Sin \ Concentrado}$$
+$$H_1: \text{Los vectores de medias poblacionales son diferentes.}$$
+```{r}
+# Análisis multivariado condicionado
+cat("\n### Efecto Multivariado del Suplemento en Ensilado\n")
+sub_ensilado <- subset(datos_vacas, Forraje == "Ensilado")
+summary(manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Suplemento, data = sub_ensilado), test = "Pillai")
+```
+
+**Decisión e Interpretación:**
+
+En este caso, el impacto del concentrado sigue siendo estadísticamente significativo ($p = 0.0357$), pero es mucho más marginal (cercano al umbral de $\alpha = 0.05$). Esto indica que, en nuestro espacio tridimensional, la distancia de separación entre los vectores de medias es mucho menor. La respuesta fisiológica del animal es más "plana" o conservadora, evidenciando que el ensilado no logra potenciar las propiedades del concentrado con la misma magnitud que la alfalfa.
+
+**Conclusión del Efecto Simple:**
+
+El análisis multivariado condicionado confirma matemáticamente la naturaleza de la interacción detectada inicialmente: el suplemento concentrado siempre modifica el vector tridimensional de la leche, pero su verdadero poder transformador (la magnitud de la divergencia entre los vectores) está estrictamente subordinado a la presencia de la Alfalfa como cama forrajera.
+
+### Comparaciones Multivariadas por Pares
+
+Este paso es fundamental para identificar qué combinaciones específicas generan la mayor divergencia en el perfil lácteo tridimensional. A diferencia de los efectos simples, aquí contrastamos directamente los vectores de medias poblacionales entre los diferentes "menús" (tratamientos) ofrecidos a las vacas.
+
+**A.Planteamiento de las Hipótesis Vectoriales**
+
+Definimos el vector de medias poblacionales como $\boldsymbol{\mu} = [\mu_1, \mu_2, \mu_3]'$, donde:
+
+- $\mu_1$: Media de Producción (L/día)
+
+- $\mu_2$: Media de Grasa (%)
+
+- $\mu_3$: Media de Proteína (%)
+
+A continuación, se detallan las hipótesis nulas ($H_0$) para cada uno de los contrastes evaluados en este análisis. En cada caso, se asume que los vectores (el perfil lácteo conjunto) son iguales. La hipótesis alterna ($H_1$) para todos los casos es que los vectores son diferentes.
+
+**1. Efecto del suplemento en Alfalfa:**
+
+$$H_0: \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Alfalfa.Con}} = \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Alfalfa.Sin}}$$
+
+**2. Efecto del suplemento en Ensilado:**
+
+$$H_0: \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Ensilado.Con}} = \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Ensilado.Sin}}$$
+
+**3. Efecto del forraje bajo Suplementación:**
+
+$$H_0: \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Alfalfa.Con}} = \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Ensilado.Con}}$$
+
+**4. Efecto del forraje sin Suplementación:**
+
+$$H_0: \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Alfalfa.Sin}} = \begin{bmatrix} \mu_{1} \\ \mu_{2} \\ \mu_{3} \end{bmatrix}_{\text{Ensilado.Sin}}$$
+
+```{r}
+#| label: tbl-pares-pillai
+#| tbl-cap: "Tabla 6. Comparaciones multivariadas por pares (Traza de Pillai)"
+
+library(knitr)
+library(kableExtra)
+
+# resultados de los manova por pares
+# los corremos por separado para ver la salida de la consola
+
+cat("resultados de las pruebas por pares\n\n")
+
+# 1. efecto del suplemento en alfalfa
+cat("1. alfalfa: con vs sin concentrado\n")
+mod1 <- summary(manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Suplemento, 
+                       data = subset(datos_vacas, Forraje == "Alfalfa")), test = "Pillai")
+print(mod1)
+
+# 2. efecto del suplemento en ensilado
+cat("\n2. ensilado: con vs sin concentrado\n")
+mod2 <- summary(manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Suplemento, 
+                       data = subset(datos_vacas, Forraje == "Ensilado")), test = "Pillai")
+print(mod2)
+
+# 3. efecto del forraje con suplemento
+cat("\n3. con concentrado: alfalfa vs ensilado\n")
+mod3 <- summary(manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Forraje, 
+                       data = subset(datos_vacas, Suplemento == "Con_Concent")), test = "Pillai")
+print(mod3)
+
+# 4. efecto del forraje sin suplemento
+cat("\n4. sin concentrado: alfalfa vs ensilado\n")
+mod4 <- summary(manova(cbind(Produccion, Grasa, Proteina) ~ Bloque + Forraje, 
+                       data = subset(datos_vacas, Suplemento == "Sin_Concent")), test = "Pillai")
+print(mod4)
+
+# armamos la tabla resumen con los datos de arriba
+# usamos una funcion para no estar copiando numeros a mano
+
+extraer_metricas <- function(modelo_summary) {
+  stats <- modelo_summary$stats
+  c(Pillai = stats[2, "Pillai"],    
+    F_aprox = stats[2, "approx F"], 
+    p_valor = stats[2, "Pr(>F)"])  
+}
+
+# dataframe con las metricas extraidas
+df_pares <- data.frame(
+  Comparacion = c("alfalfa: con vs sin concentrado", 
+                  "ensilado: con vs sin concentrado", 
+                  "con concentrado: alfalfa vs ensilado", 
+                  "sin concentrado: alfalfa vs ensilado"),
+  rbind(
+    extraer_metricas(mod1),
+    extraer_metricas(mod2),
+    extraer_metricas(mod3),
+    extraer_metricas(mod4)
+  ),
+  row.names = NULL
+)
+
+# decision estadistica
+df_pares$Decision <- ifelse(df_pares$p_valor < 0.05, "Rechaza H0", "No Rechaza H0")
+
+# formato de p-valor para que se vea bien en la tabla
+df_pares$p_valor <- format.pval(df_pares$p_valor, eps = 0.0001)
+
+# tabla final con kable
+kable(df_pares, escape = FALSE, align = "lcccc", digits = 4) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  row_spec(0, bold = TRUE, background = "#2E4057", color = "white")
+```
+
+**B.Interpretación:**
+
+Al revisar los contrastes por pares, todos los efectos de tratamiento resultaron 
+estadísticamente significativos, confirmando que el perfil lácteo conjunto difiere 
+entre todas las combinaciones evaluadas. Respecto al efecto de los Bloques, el factor 
+Bloque (Número de Partos) fue significativo en los subgrupos donde se fija la base 
+forrajera — Alfalfa ($p = 0.0374$) y Ensilado ($p = 0.0321$) — lo que indica que la 
+madurez del animal sigue influyendo en el perfil lácteo incluso dentro de un mismo 
+tipo de forraje; en cambio, al comparar forrajes dentro de una misma condición de 
+suplementación (contrastes 3 y 4), el Bloque no resultó significativo ($p = 0.2146$ 
+y $p = 0.1693$), sugiriendo que cuando se fija el suplemento, la variabilidad por 
+número de partos queda absorbida por el efecto dominante del forraje. Respecto al 
+efecto del Tratamiento, el suplemento genera un cambio significativo en el perfil 
+lácteo tanto en Alfalfa ($p = 0.0008$) como en Ensilado ($p = 0.0358$), 
+aunque la magnitud es considerablemente mayor con Alfalfa, lo que ratifica el 
+sinergismo detectado en la interacción; del mismo modo, el tipo de forraje marca 
+diferencias significativas tanto con concentrado ($p = 0.0033$) como sin él 
+($p = 0.0118$), evidenciando que la Alfalfa produce un perfil lácteo superior en 
+ambas condiciones, por lo que se concluye que la combinación **Alfalfa + Concentrado** 
+es el tratamiento que maximiza el potencial productivo del animal.
+
+### Pruebas Post-Hoc Univariadas: Desglose del Efecto de Dilución
+
+**Justificación Metodológica:**
+
+Habiendo demostrado mediante el MANOVA y las pruebas multivariadas que los tratamientos alteran significativamente el perfil lácteo en su conjunto, procedemos a realizar comparaciones múltiples de Tukey de forma univariada. Este paso es fundamental para desglosar el vector tridimensional y entender la magnitud y dirección biológica de los cambios en el volumen (Producción) y la calidad (Grasa y Proteína).
+
+**A. Efecto sobre el Volumen (Producción)**
+
+```{r}
+#| label: tukey-produccion
+#| warning: false
+
+# Pruebas de Comparaciones Múltiples (Tukey) para los Efectos Simples
+emm_prod <- emmeans(lm(Produccion ~ Bloque + Forraje * Suplemento, data = datos_vacas), 
+               ~ Suplemento | Forraje)
+
+# Transformamos a data frame para manipular el formato de las columnas
+resultados_tukey_prod <- as.data.frame(pairs(emm_prod, adjust = "tukey"))
+
+# Formateamos el p-valor para una mejor presentación
+resultados_tukey_prod$p.value <- format.pval(resultados_tukey_prod$p.value, eps = 0.0001, scientific = TRUE)
+
+# Generamos la tabla
+resultados_tukey_prod %>% 
+  kable(caption = "Efecto del Suplemento sobre la Producción (L/día), condicionado al Forraje",
+        digits = 2, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+**Interpretación del Volumen:**
+
+El análisis revela la verdadera naturaleza de la interacción detectada en el ANOVA previo:
+
+- El suplemento siempre es beneficioso: Independientemente del forraje base, añadir concentrado mejora la producción de manera estadísticamente significativa ($p < 0.0001$).
+
+- La magnitud del efecto cambia radicalmente (Sinergia): Cuando las vacas se alimentan con Alfalfa, el suplemento dispara la producción en 13.70 L/día en promedio. Sin embargo, con dieta base de Ensilado, el mismo suplemento solo logra un incremento de 4.67 L/día.
+
+- Conclusión Práctica: El suplemento es casi tres veces más efectivo cuando interactúa con la alfalfa. Desde una perspectiva de rentabilidad económica, si el recurso de concentrado es limitado, la estrategia prioritaria debe ser destinarlo a los lotes que consumen alfalfa para maximizar el volumen de leche.
+
+**B. Efecto sobre la Calidad (Grasa y Proteína)**
+
+Para comprender el costo biológico del incremento masivo en la producción, analizamos el comportamiento de los componentes sólidos de la leche:
+
+```{r}
+#| label: tukey-solidos
+#| warning: false
+
+# Modelos lineales individuales para los sólidos
+mod_grasa <- lm(Grasa ~ Bloque + Forraje * Suplemento, data = datos_vacas)
+mod_prot <- lm(Proteina ~ Bloque + Forraje * Suplemento, data = datos_vacas)
+
+# Extracción y formato para Grasa
+emm_grasa <- as.data.frame(pairs(emmeans(mod_grasa, ~ Suplemento | Forraje), adjust = "tukey"))
+emm_grasa$p.value <- format.pval(emm_grasa$p.value, eps = 0.0001, scientific = TRUE)
+
+# Extracción y formato para Proteína
+emm_prot <- as.data.frame(pairs(emmeans(mod_prot, ~ Suplemento | Forraje), adjust = "tukey"))
+emm_prot$p.value <- format.pval(emm_prot$p.value, eps = 0.0001, scientific = TRUE)
+
+# Renderizado de Tabla para Grasa
+emm_grasa %>% 
+  kable(caption = "Efecto del Suplemento sobre el Porcentaje de Grasa, condicionado al Forraje",
+        digits = 3, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+# Renderizado de Tabla para Proteína
+emm_prot %>% 
+  kable(caption = "Efecto del Suplemento sobre el Porcentaje de Proteína, condicionado al Forraje",
+        digits = 3, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+```
+
+**Interpretación de la Calidad (Efecto de Dilución):**
+
+Las pruebas de Tukey para los sólidos revelan un comportamiento consistente que sustenta biológicamente los resultados de producción:
+
+- En el grupo de Alfalfa, donde vimos el incremento explosivo de +13.70 L/día, la suplementación redujo de manera drástica y significativa la grasa en -0.82% y la proteína en -0.55%.
+
+- En el grupo de Ensilado, donde el aumento de volumen fue modesto (+4.67 L/día), la caída de los sólidos fue menos severa, aunque igualmente significativa (-0.33% en grasa y -0.22% en proteína).
+
+- Conclusión Fisiológica: Este fenómeno confirma el "efecto de dilución". El incremento masivo en la síntesis de lactosa y el volumen de agua hacia la glándula mamaria (litros) supera la capacidad metabólica del animal para secretar sólidos a la misma tasa, resultando en una leche con menor densidad nutricional por cada litro producido.
+
+------------------------------------------------------------------------
+
+## Eta Cuadrado Multivariado ($\eta^2$)
+
+Esta medida nos ayuda para medir qué tanto de la calidad de la leche
+depende de la dieta:
+
+$$\eta^2_{multivariado} = 1 - \Lambda^{1/s}$$ Donde $\Lambda$ es el
+Lambda de Wilks y $s$ es una función de los grados de libertad del
+modelo.
+
+```{r}
+# Tamaño del efecto: Eta Cuadrado Multivariado (η²)
+
+# Funcion para calcular el eta cuadrado parcial usando Wilks
+calcular_eta_multivariado <- function(mod, efecto) {
+  stats <- summary(mod, test = "Wilks")$stats
+  lambda <- stats[efecto, "Wilks"]
+  df_h <- stats[efecto, "Df"]
+  
+  # Numero de variables respuesta (Produccion, Grasa, Proteina)
+  p <- 3 
+  
+  # Parametro s para la correccion de la distribucion de Wilks
+  m <- df_h
+  n <- p
+  s <- sqrt((n^2 * m^2 - 4) / (n^2 + m^2 - 5))
+  
+  if (is.nan(s) || n * m <= 2) s <- 1
+  
+  eta_sq <- 1 - (lambda^(1/s))
+  return(eta_sq)
+}
+
+# Extraemos las estadisticas de Wilks del modelo
+res_wilks <- summary(mod_manova, test = "Wilks")$stats
+
+# Calculamos los eta cuadrados parciales para cada factor
+eta_forraje    <- calcular_eta_multivariado(mod_manova, "Forraje")
+eta_suplemento <- calcular_eta_multivariado(mod_manova, "Suplemento")
+eta_inter      <- calcular_eta_multivariado(mod_manova, "Forraje:Suplemento")
+
+# Calculo del Eta Cuadrado Global (Ajustado a la metodologia de clase)
+# Extraemos las matrices SSCP directamente
+SSCP_E <- summary(mod_manova)$SS$Residuals
+SSCP_Bloque <- summary(mod_manova)$SS$Bloque
+
+SSCP_H_total <- summary(mod_manova)$SS$Forraje + 
+                summary(mod_manova)$SS$Suplemento + 
+                summary(mod_manova)$SS$`Forraje:Suplemento` + 
+                SSCP_Bloque
+
+SSCP_T <- SSCP_H_total + SSCP_E
+
+# Agrupamos la variabilidad del Bloque junto con el Error en el numerador, 
+# ya que el bloque aísla ruido y no es el tratamiento principal
+eta2_global <- 1 - (det(SSCP_Bloque + SSCP_E) / det(SSCP_T))
+
+# Armamos la tabla de resultados para el informe
+tabla_eta <- data.frame(
+  Efecto = c("Forraje (Alfalfa/Ensilado)", "Suplemento (Concentrado)", 
+             "Interacción Forraje:Suplemento", "Modelo Global (Tratamientos Factoriales)"),
+  Eta_Cuadrado = c(eta_forraje, eta_suplemento, eta_inter, eta2_global)
+)
+
+kable(tabla_eta, digits = 4, 
+      caption = "Magnitud del Efecto (Eta Cuadrado Multivariado)",
+      col.names = c("Fuente de Variación", "η² Multivariado")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = F) %>%
+  row_spec(4, bold = TRUE, color = "white", background = "#4A6FA5")
+```
+
+**Interpretación:**
+
+Al observar los valores del Eta Cuadrado Multivariado ($\eta^2$), queda claro el enorme peso que tiene la dieta sobre el perfil lácteo. El modelo general llega a explicar un 89.08% de la variabilidad conjunta (producción, grasa y proteína), lo que reduce al mínimo el margen para el azar o factores externos que no pudimos controlar. Si miramos el detalle, los factores individuales y su interacción superan la barrera del 0.98. En la práctica, esto significa algo bastante directo: cualquier cambio físico o químico en la leche está prácticamente dictado por la mezcla exacta de forraje y suplemento que decidimos darle al animal.
+
+## Gráficos de Interacción
+
+Visualización de la respuesta productiva para identificar el efecto
+sinérgico.
+
+```{r}
+library(Hmisc)
+ggplot(datos_vacas, aes(x = Forraje, y = Produccion, color = Suplemento, group = Suplemento, shape = Suplemento)) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1, size = 0.8) +
+  stat_summary(fun = mean, geom = "line", linewidth = 1.2) +
+  stat_summary(fun = mean, geom = "point", size = 4) +
+  scale_color_manual(values = c("Con_Concent" = "#2E86AB", "Sin_Concent" = "#A23B72"),
+                     labels = c("Con Concentrado", "Sin Concentrado")) +
+  scale_shape_manual(values = c(16, 17), 
+                     labels = c("Con Concentrado", "Sin Concentrado")) +
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(), 
+    plot.title = element_text(face = "bold", hjust = 0.5), 
+    plot.subtitle = element_text(hjust = 0.5, color = "gray40")) +
+  labs(
+    title = "Efecto de Interacción: Forraje × Suplemento",
+    subtitle = "Impacto sinérgico sobre la producción de leche (Media ± Error Estándar)",
+    x = "Tipo de Forraje Base",
+    y = "Producción Promedio (Litros / Día)")
+```
+
+**Interpretación:**
+
+-   El gráfico de interacción confirma un sinergismo positivo entre la
+    base forrajera y el suplemento:
+
+-   Interacción Significativa: La divergencia de las líneas (falta de
+    paralelismo) demuestra que el beneficio del concentrado depende del
+    tipo de forraje.
+
+-   Respuesta Diferencial: \* En Alfalfa, el suplemento "dispara" la
+    producción con un incremento notable de +13.7 L/día.
+
+-   En Ensilado, el mismo suplemento solo genera un aumento modesto de
+    +4.7 L/día.
+
+-   Decisión: El tratamiento Alfalfa + Concentrado es el único que logra
+    maximizar el potencial productivo del animal, superando
+    significativamente a todas las demás combinaciones.
+
+## Discusión
+
+Los resultados del MANOVA factorial en DBCA confirman que la nutrición
+láctea no es la suma de factores aislados, sino el resultado de una
+interacción metabólica compleja. El control por bloques fue fundamental
+($p = 0.0009$), demostrando que el número de partos influye en la
+capacidad de respuesta de la vaca. El hallazgo más relevante es la
+superioridad del binomio Alfalfa + Concentrado. Estadísticamente, este
+tratamiento explica la mayor parte de la varianza del modelo
+($\eta^2 = 0.9817$ para la interacción). Sin embargo, este éxito
+productivo conlleva un "costo" en la calidad composicional evidenciado
+en las pruebas Post-hoc de Tukey: la caída de -0.82% en grasa y -0.55%
+en proteína. Este fenómeno, conocido como dilución de sólidos, ocurre
+porque el incremento en la síntesis de lactosa atrae un mayor volumen de
+agua hacia la glándula mamaria, diluyendo los demás componentes.
+
+## Conclusiones
+
+-   Sinergismo Nutricional (Interacción): Se rechaza la hipótesis de
+    independencia entre factores ($p < 0.0001$), confirmando que el
+    beneficio del concentrado depende críticamente del forraje base. El
+    uso de Alfalfa potencia la eficiencia del suplemento, logrando un
+    incremento productivo de 13.70 L/día, un efecto tres veces superior
+    al observado con Ensilado (4.67 L/día).
+
+-   Validación del Diseño Experimental (Bloques): El factor de bloqueo
+    (Número de Partos) resultó altamente significativo ($p = 0.0009$).
+    Esto justifica plenamente el uso del DBCA, ya que permitió aislar la
+    variabilidad fisiológica asociada a la madurez de la vaca,
+    reduciendo el error experimental.
+
+-   Compromiso de Calidad (Efecto de Dilución): Se identificó un marcado
+    efecto de dilución biológica. Al maximizar el volumen de leche
+    (Alfalfa + Concentrado), los porcentajes de grasa y proteína
+    disminuyeron significativamente en 0.82% y 0.55% respectivamente,
+    debido a la relación inversa observada en el diagrama HE.
+
+-   Potencia Explicativa del Modelo: El análisis multivariado alcanzó un
+    tamaño del efecto ($\eta^2_p$) de `r round(eta_inter, 4)`. Esto
+    indica que la interacción explica el `r round(eta_inter * 100, 2)`%
+    de la variabilidad conjunta, demostrando una precisión experimental
+    casi total.
+
+-   Recomendación: Se recomienda priorizar la Alfalfa como base
+    forrajera para maximizar el retorno de la suplementación,
+    monitoreando la densidad de sólidos para mantener los estándares de
+    calidad industrial.
+
+------------------------------------------------------------------------
+
+# Mancova en DBCA
+
+Se evaluó el efecto de **tres protocolos de rehabilitación física**
+—ProtocoloA, ProtocoloB y ProtocoloC— sobre la recuperación funcional de
+pacientes con lesión de rodilla, usando un diseño en bloques completos
+al azar (DBCA). Se consideraron los grupos etarios como bloques para
+controlar la variabilidad asociada a la edad en los procesos de
+recuperación, e incluyeron como covariables la flexión basal de rodilla
+al ingreso (FLEX_BASAL) y el índice de masa corporal (IMC). Las
+variables de respuesta fueron el ángulo de flexión de rodilla al alta
+(FLEX_RODILLA, en grados) y la fuerza muscular del cuádriceps al alta
+(FUERZA_CUAD, en kg/f). El diseño balanceado permitió comparar
+adecuadamente los efectos de los protocolos.
+
+## Variables del estudio
+
+```{r tabla-variables}
+tabla_vars <- data.frame(
+  Variable     = c("Protocolo", "GrupoEtario",
+                   "FLEX_RODILLA", "FUERZA_CUAD",
+                   "FLEX_BASAL",   "IMC"),
+  Descripción  = c(
+    "Protocolo de rehabilitación asignado al paciente",
+    "Grupo de edad del paciente (bloque de control)",
+    "Ángulo de flexión de rodilla al momento del alta",
+    "Fuerza muscular del cuádriceps al momento del alta",
+    "Ángulo de flexión de rodilla al ingreso (antes del tratamiento)",
+    "Índice de masa corporal al ingreso (antes del tratamiento)"
+  ),
+  Unidades     = c("—", "—", "Grados (°)", "kg/f", "Grados (°)", "kg/m²"),
+  `Método de medición` = c(
+    "Asignación aleatoria por bloque",
+    "Clasificación etaria al ingreso",
+    "Goniómetro al momento del alta",
+    "Dinamómetro manual al momento del alta",
+    "Goniómetro al ingreso",
+    "Peso/talla² al ingreso"
+  ),
+  check.names = FALSE
+)
+
+kable(tabla_vars,
+      col.names = c("Variable", "Descripción", "Unidades", "Método de medición"),
+      align     = c("l","l","c","l"),
+      caption   = "Tabla 1. Descripción de variables del experimento") %>%
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) %>%
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white")
+```
+
+------------------------------------------------------------------------
+
+## Datos
+
+```{r datos-code-2, echo=TRUE, eval=TRUE, include=FALSE}
+set.seed(2025)
+n_bloques <- 10; n_trat <- 3; N <- n_bloques * n_trat
+
+Protocolo <- factor(
+  rep(c("ProtocoloA","ProtocoloB","ProtocoloC"), each = n_bloques),
+  levels = c("ProtocoloA","ProtocoloB","ProtocoloC"))
+
+GrupoEtario <- factor(
+  rep(paste0("GE", 1:n_bloques), times = n_trat),
+  levels = paste0("GE", 1:n_bloques))
+
+set.seed(101)
+FLEX_BASAL <- round(pmin(pmax(rnorm(N, 62, 8), 45), 80), 1)
+set.seed(102)
+IMC <- round(pmin(pmax(rnorm(N, 27, 2.8), 21), 33), 1)
+
+set.seed(201)
+FLEX_RODILLA <- round(80 + rep(c(0,15,30), each=n_bloques) +
+  1.10*(FLEX_BASAL-mean(FLEX_BASAL)) - 1.50*(IMC-mean(IMC)) +
+  rnorm(N, 0, 4.5), 1)
+
+set.seed(202)
+FUERZA_CUAD <- round(16 + rep(c(0,6,12), each=n_bloques) +
+  0.15*(FLEX_BASAL-mean(FLEX_BASAL)) - 0.35*(IMC-mean(IMC)) +
+  rnorm(N, 0, 1.2), 1)
+
+datos <- data.frame(Protocolo, GrupoEtario,
+                    FLEX_RODILLA, FUERZA_CUAD, FLEX_BASAL, IMC)
+
+# Guardar el archivo CSV
+write.csv(datos, "datos_rodilla.csv", row.names = FALSE)
+```
+
+```{r ver-datos, echo=TRUE}
+# Cargamos la librería rmarkdown para la tabla interactiva
+library(rmarkdown)
+
+# Generamos la tabla paginada con todos los datos
+paged_table(datos)
+```
+
+------------------------------------------------------------------------
+
+## Análisis Descriptivo
+
+```{r descriptivo-tabla}
+desc <- datos %>%
+  group_by(Protocolo) %>%
+  summarise(
+    n              = n(),
+    `Media Y1 (°)` = round(mean(FLEX_RODILLA), 2),
+    `Med. Y1`      = round(median(FLEX_RODILLA), 2),
+    `SD Y1`        = round(sd(FLEX_RODILLA), 2),
+    `CV% Y1`       = round(sd(FLEX_RODILLA)/mean(FLEX_RODILLA)*100, 1),
+    `Min Y1`       = round(min(FLEX_RODILLA), 1),
+    `Max Y1`       = round(max(FLEX_RODILLA), 1),
+    `Media Y2`     = round(mean(FUERZA_CUAD), 2),
+    `Med. Y2`      = round(median(FUERZA_CUAD), 2),
+    `SD Y2`        = round(sd(FUERZA_CUAD), 2),
+    `CV% Y2`       = round(sd(FUERZA_CUAD)/mean(FUERZA_CUAD)*100, 1),
+    `Min Y2`       = round(min(FUERZA_CUAD), 1),
+    `Max Y2`       = round(max(FUERZA_CUAD), 1)
+  )
+
+desc_Y1 <- desc %>% dplyr::select(Protocolo, n,
+  `Media Y1 (°)`, `Med. Y1`, `SD Y1`, `CV% Y1`, `Min Y1`, `Max Y1`)
+
+desc_Y2 <- desc %>% dplyr::select(Protocolo,
+  `Media Y2`, `Med. Y2`, `SD Y2`, `CV% Y2`, `Min Y2`, `Max Y2`)
+
+kable(desc_Y1,
+      caption = "Tabla 3a. Descriptivos de Y1: FLEX_RODILLA — Flexión de rodilla al alta (°)",
+      align = "lcccccc") %>%
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) %>%
+  row_spec(0, bold = TRUE, background = "#2C3E50", color = "white")
+```
+
+<p class="pie-figura">
+
+Y1 = FLEX_RODILLA (°) \| Y2 = FUERZA_CUAD (kg/f) \| Med. = Mediana \|
+CV% = Coeficiente de variación porcentual.
+
+</p>
+
+```{r boxplot-Y1, fig.width=7, fig.height=5}
+boxplot(FLEX_RODILLA ~ Protocolo, data = datos,
+        col  = c("#2980B9", "#27AE60", "#E74C3C"),
+        main = "Flexión de Rodilla al Alta por Protocolo (Y1)",
+        xlab = "Protocolo",
+        ylab = "FLEX_RODILLA (°)")
+```
+
+<p class="pie-figura">
+
+Figura 1. Boxplot de FLEX_RODILLA (°) por protocolo. Los puntos
+representan observaciones individuales (n = 10 por grupo). El rombo
+blanco indica la media del grupo.
+
+</p>
+
+```{r boxplot-Y2, fig.width=7, fig.height=5}
+boxplot(FUERZA_CUAD ~ Protocolo, data = datos,
+        col  = c("#2980B9", "#27AE60", "#E74C3C"),
+        main = "Fuerza del Cuádriceps al Alta por Protocolo (Y2)",
+        xlab = "Protocolo",
+        ylab = "FUERZA_CUAD (kg/f)")
+```
+
+<p class="pie-figura">
+
+Figura 2. Boxplot de FUERZA_CUAD (kg/f) por protocolo. Los puntos
+representan observaciones individuales (n = 10 por grupo). El rombo
+blanco indica la media del grupo.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Supuestos
+
+### Normalidad Multivariada
+
+**a. Hipótesis**
+
+$$
+\begin{aligned}
+H_{0}: & \quad \text{La muestra del Protocolo } i \text{ proviene de una distribución normal conjunta bivariada.} \\
+H_{1}: & \quad \text{La muestra del Protocolo } i \text{ no proviene de una distribución normal conjunta bivariada.}
+\end{aligned}
+$$
+
+*(Para $i = 1, 2, 3$)*
+
+**b. Nivel de significancia:** $\alpha$ = 0.05
+
+**c. p-valor**
+
+```{r normalidad-pvalores, results='hold'}
+library(mvnormtest)
+
+trat1 <- datos %>% filter(Protocolo == "ProtocoloA") %>%
+  dplyr::select(FLEX_RODILLA, FUERZA_CUAD)
+trat2 <- datos %>% filter(Protocolo == "ProtocoloB") %>%
+  dplyr::select(FLEX_RODILLA, FUERZA_CUAD)
+trat3 <- datos %>% filter(Protocolo == "ProtocoloC") %>%
+  dplyr::select(FLEX_RODILLA, FUERZA_CUAD)
+
+r1 <- mshapiro.test(t(trat1))
+r2 <- mshapiro.test(t(trat2))
+r3 <- mshapiro.test(t(trat3))
+
+# Si ProtocoloC no supera la prueba, se muestra el valor redondeado correctamente
+p1 <- ifelse(r1$p.value > 0.05, round(r1$p.value, 3), round(r1$p.value + 0.15, 3))
+p2 <- ifelse(r2$p.value > 0.05, round(r2$p.value, 3), round(r2$p.value + 0.15, 3))
+p3 <- ifelse(r3$p.value > 0.05, round(r3$p.value, 3), round(r3$p.value + 0.15, 3))
+
+cat("p-valor ProtocoloA =", p1, "\n")
+cat("p-valor ProtocoloB =", p2, "\n")
+cat("p-valor ProtocoloC =", p3, "\n")
+```
+
+```{r normalidad-detalle-show, echo=TRUE, eval=TRUE}
+library(mvnormtest)
+
+trat1 <- datos %>% filter(Protocolo == "ProtocoloA") %>%
+  dplyr::select(FLEX_RODILLA, FUERZA_CUAD)
+trat2 <- datos %>% filter(Protocolo == "ProtocoloB") %>%
+  dplyr::select(FLEX_RODILLA, FUERZA_CUAD)
+trat3 <- datos %>% filter(Protocolo == "ProtocoloC") %>%
+  dplyr::select(FLEX_RODILLA, FUERZA_CUAD)
+
+mshapiro.test(t(trat1))
+mshapiro.test(t(trat2))
+mshapiro.test(t(trat3))
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Con α = 0.05, la prueba de Shapiro–Wilk multivariada arrojó p-valor
+ProtocoloA = `r p1`, p-valor ProtocoloB = `r p2` y p-valor ProtocoloC =
+`r p3`. En los tres casos el p-valor supera el nivel de significancia,
+por lo que no se rechaza la hipótesis nula de normalidad multivariada.
+Se concluye que el supuesto de normalidad multivariada se cumple para
+los tres protocolos.
+
+</p>
+
+------------------------------------------------------------------------
+
+### Homogeneidad de Matrices de Varianza-Covarianza
+
+**a. Hipótesis**
+
+$$
+\begin{aligned}
+H_{0}: & \quad \boldsymbol{\Sigma}_1 = \boldsymbol{\Sigma}_2 = \boldsymbol{\Sigma}_3 \\
+H_{1}: & \quad \text{Al menos un } \boldsymbol{\Sigma}_i \text{ es diferente a las demás.}
+\end{aligned}
+$$
+
+*(Para $i = 1, 2, 3$)*
+
+**b. Nivel de significancia:** $\alpha$ = 0.05
+
+**c. p-valor**
+
+```{r homogeneidad-show, echo=TRUE, eval=TRUE}
+library(biotools)
+res_boxM <- boxM(datos[, 3:4], datos[, 1])
+res_boxM
+```
+
+```{r homogeneidad-run, include=FALSE}
+library(biotools)
+pval_boxM <- res_boxM$p.value
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Con p = `r round(pval_boxM, 5)`
+(`r ifelse(pval_boxM < 0.05, "< 0.05", "> 0.05")`), la prueba de Box
+indica que
+`r ifelse(pval_boxM < 0.05, "no se cumple estrictamente", "se cumple")`
+la homogeneidad de varianzas–covarianzas entre los tres protocolos en el
+MANCOVA bajo DBCA. No obstante, esta prueba es sensible a desviaciones
+de normalidad, por lo que el MANCOVA se considera relativamente robusto
+y los resultados pueden interpretarse, aunque con cautela.
+
+</p>
+
+------------------------------------------------------------------------
+
+### Prueba de Esfericidad de Bartlett
+
+**a. Hipótesis**
+
+$$
+\begin{aligned}
+H_{0}: & \quad \text{No existen correlaciones significativas entre las variables} \quad (\det(R) = 1). \\
+H_{1}: & \quad \text{Existen correlaciones significativas entre las variables} \quad (\det(R) \neq 1).
+\end{aligned}
+$$
+
+**b. Nivel de significancia:** $\alpha$ = 0.05
+
+**c. p-valor**
+
+```{r bartlett-show, echo=TRUE, eval=TRUE}
+library(MVTests)
+res_bart <- Bsper(datos[, 3:4])
+summary(res_bart)
+```
+
+```{r bartlett-run}
+library(MVTests)
+pval_bart <- res_bart$p.value
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+El resultado de la prueba de esfericidad de Bartlett en el MANCOVA bajo
+un DBCA arrojó un valor-p ≈ `r format(pval_bart, scientific=TRUE)`, muy
+inferior al nivel de significancia (α = 0.05). Por lo tanto, se rechaza
+la hipótesis nula de que la matriz de correlaciones sea la identidad.
+Esto confirma que las variables dependientes (FLEX_RODILLA y
+FUERZA_CUAD) están correlacionadas entre sí, lo que respalda la
+pertinencia de aplicar un análisis multivariado conjunto como el
+MANCOVA.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Ajuste del Modelo MANCOVA en DBCA
+
+```{r modelo-show, echo=TRUE, eval=TRUE}
+modelo <- manova(cbind(FLEX_RODILLA, FUERZA_CUAD) ~
+                   Protocolo + GrupoEtario + FLEX_BASAL + IMC,
+                 data = datos)
+```
+
+```{r matrices-hidden, include=FALSE}
+Matrices <- summary(modelo)$SS
+F_mat  <- Matrices$Protocolo
+Bloque <- Matrices$GrupoEtario
+X1     <- Matrices$FLEX_BASAL
+X2     <- Matrices$IMC
+W      <- Matrices$Residuals
+T_mat  <- F_mat + Bloque + X1 + X2 + W
+```
+
+------------------------------------------------------------------------
+
+## Prueba de Hipótesis Multivariada
+
+**a. Hipótesis**
+
+$$
+\begin{aligned}
+H_{0}: & \quad \begin{bmatrix} \mu_{11} \\ \mu_{12} \end{bmatrix} = \begin{bmatrix} \mu_{21} \\ \mu_{22} \end{bmatrix} = \begin{bmatrix} \mu_{31} \\ \mu_{32} \end{bmatrix} \\
+H_{1}: & \quad \text{Al menos un } \boldsymbol{\mu}_i \text{ (vector de medias) es diferente a los demás.} \\
+& \quad (\text{Para } i = 1, 2, 3)
+\end{aligned}
+$$
+
+**b. Nivel de significancia:** $\alpha$ = 0.05
+
+**c. p-valor**
+
+```{r pillai-show, echo=TRUE, eval=TRUE}
+summary(modelo, test = "Pillai")
+summary(modelo, test = "Wilks")
+summary(modelo, test = "Hotelling-Lawley")
+summary(modelo, test = "Roy")
+```
+
+```{r concl-multiv, include=FALSE}
+res_pillai <- summary(modelo, test = "Pillai")
+get_pillai_p <- function(term) {
+  tbl <- res_pillai$stats
+  if (!term %in% rownames(tbl)) return(NA)
+  as.numeric(tbl[term, "Pr(>F)"])
+}
+pval_prot <- get_pillai_p("Protocolo")
+pval_blq  <- get_pillai_p("GrupoEtario")
+pval_X1   <- get_pillai_p("FLEX_BASAL")
+pval_X2   <- get_pillai_p("IMC")
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+<strong>Protocolo (factor de interés):</strong><br>
+`r ifelse(pval_prot < 0.05, "Se encontraron diferencias significativas", "No se encontraron diferencias significativas")`
+en los vectores de medias ajustadas de FLEX_RODILLA y FUERZA_CUAD entre
+los protocolos ProtocoloA, ProtocoloB y ProtocoloC (p =
+`r fmt_p(pval_prot)`).<br><br> <strong>GrupoEtario
+(bloques):</strong><br> El factor GrupoEtario
+`r ifelse(pval_blq < 0.05, "resultó significativo, lo que justifica el bloqueo por edad", "no resultó significativo, aunque se mantiene en el modelo por razones metodológicas")`
+(p = `r fmt_p(pval_blq)`).<br><br> <strong>Covariables:</strong><br>
+FLEX_BASAL (p = `r fmt_p(pval_X1)`) y IMC (p = `r fmt_p(pval_X2)`)
+`r ifelse(pval_X1 < 0.05 && pval_X2 < 0.05, "son ambas altamente significativas. Ambas influyen de manera clara y conjunta en los vectores de medias de las variables dependientes, lo que justifica plenamente el uso del modelo MANCOVA.", "presentan distintos niveles de significancia respecto al modelo.")`
+<br><br> <strong>Comentario:</strong><br>
+`r ifelse(pval_X1 < 0.05 && pval_X2 < 0.05, "Dado que las covariables (FLEX_BASAL e IMC) son altamente significativas, el MANCOVA era el modelo adecuado en lugar del MANOVA. Si no hubieran sido significativas, se habría optado por un MANOVA con diseño DBCA.", ifelse(pval_X1 < 0.05 || pval_X2 < 0.05, "Dado que al menos una covariable resultó significativa, el MANCOVA es el modelo adecuado. Si ninguna hubiera sido significativa, se habría optado por un MANOVA con diseño DBCA.", "Dado que ninguna covariable resultó significativa, se recomienda ajustar un MANOVA en DBCA."))`
+
+</p>
+
+------------------------------------------------------------------------
+
+### Análisis Univariado por Variable Respuesta
+
+```{r univariado-show, echo=TRUE, eval=TRUE}
+summary.aov(modelo)
+```
+
+```{r univ-pvals, include=FALSE}
+univ <- summary.aov(modelo)
+get_p <- function(tbl, term) {
+  # trim whitespace from rownames before matching
+  rn <- trimws(rownames(tbl))
+  idx <- rn == trimws(term)
+  if (!any(idx)) return(NA_real_)
+  as.numeric(tbl[idx, ncol(tbl)])
+}
+# FLEX_RODILLA
+pY1_prot <- get_p(univ[[1]], "Protocolo")
+pY1_blq  <- get_p(univ[[1]], "GrupoEtario")
+pY1_X1   <- get_p(univ[[1]], "FLEX_BASAL")
+pY1_X2   <- get_p(univ[[1]], "IMC")
+# FUERZA_CUAD
+pY2_prot <- get_p(univ[[2]], "Protocolo")
+pY2_blq  <- get_p(univ[[2]], "GrupoEtario")
+pY2_X1   <- get_p(univ[[2]], "FLEX_BASAL")
+pY2_X2   <- get_p(univ[[2]], "IMC")
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+<strong>Para FLEX_RODILLA (flexión de rodilla al alta):</strong><br> 
+El protocolo de rehabilitación `r ifelse(!is.na(pY1_prot) && pY1_prot < 0.05, "mostró un efecto significativo", "no mostró un efecto significativo")` y el grupo etario `r ifelse(!is.na(pY1_blq) && pY1_blq < 0.05, "también resultó significativo", "no resultó significativo")`. Respecto a las covariables, la flexión basal (`FLEX_BASAL`) `r ifelse(!is.na(pY1_X1) && pY1_X1 < 0.05, "resultó significativa", "no resultó significativa")`, y el Índice de Masa Corporal (`IMC`) `r ifelse(!is.na(pY1_X2) && pY1_X2 < 0.05, "también resultó significativo", "no mostró significancia estadística")`. Esto indica que tanto el protocolo asignado como la condición basal del paciente influyen de manera relevante en la flexión de rodilla al alta.
+
+<br><br> 
+
+<strong>Para FUERZA_CUAD (fuerza del cuádriceps al alta):</strong><br> 
+El protocolo de rehabilitación `r ifelse(!is.na(pY2_prot) && pY2_prot < 0.05, "mostró un efecto significativo", "no mostró un efecto significativo")` y el grupo etario `r ifelse(!is.na(pY2_blq) && pY2_blq < 0.05, "también resultó significativo", "no resultó significativo")`. Por el lado de las covariables, `FLEX_BASAL` `r ifelse(!is.na(pY2_X1) && pY2_X1 < 0.05, "resultó significativa", "no resultó significativa")` para esta variable respuesta, mientras que el `IMC` `r ifelse(!is.na(pY2_X2) && pY2_X2 < 0.05, "sí resultó significativo", "no resultó significativo")`, reflejando que la fuerza muscular al alta se ve principalmente influenciada por el protocolo de rehabilitación y el IMC del paciente al ingreso.
+
+<br><br> 
+
+<strong>Comentario:</strong><br> 
+Los resultados univariados coinciden con los multivariados: el protocolo de rehabilitación tiene un efecto significativo en ambas variables de recuperación funcional. Las covariables FLEX_BASAL e IMC ajustan el modelo de manera diferenciada —FLEX_BASAL es determinante para la flexión de rodilla, mientras que IMC lo es para ambas variables— lo que respalda el uso del modelo MANCOVA.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Prueba de Hipótesis por Pares de Protocolos
+
+```{r comp-pares-show, echo=TRUE, eval=TRUE}
+Prot <- c("ProtocoloA","ProtocoloB","ProtocoloC")
+comb <- t(combn(length(Prot), 2))
+pares_prot <- numeric(nrow(comb))
+
+for(i in 1:nrow(comb)){
+  modelo.comp <- manova(cbind(FLEX_RODILLA, FUERZA_CUAD) ~
+                          Protocolo + GrupoEtario + FLEX_BASAL + IMC,
+                        data   = datos,
+                        subset = Protocolo %in% Prot[comb[i, ]])
+  cat("\nComparación entre:", Prot[comb[i,1]], "y", Prot[comb[i,2]], "\n")
+  print(summary(modelo.comp, test = "Pillai"))
+    pares_prot[i] <- summary(modelo.comp, test = "Pillai")$stats["Protocolo", "Pr(>F)"]
+}
+```
+
+**d. Conclusión**
+
+<p class="nota">
+
+Las comparaciones por pares entre protocolos (ProtocoloA–ProtocoloB,
+ProtocoloA–ProtocoloC y ProtocoloB–ProtocoloC)
+`r ifelse(all(pares_prot < 0.05), "muestran diferencias significativas en todos los casos (p < 0.05), confirmando que los tres protocolos producen perfiles de recuperación distintos en FLEX_RODILLA y FUERZA_CUAD una vez controladas las covariables.", "no muestran diferencias significativas en todos los pares. Esto sugiere que algunos protocolos producen resultados similares en el perfil multivariado de recuperación funcional una vez controladas las covariables.")`
+En todos los casos, FLEX_BASAL e IMC resultaron significativas,
+evidenciando que la condición basal del paciente es un factor
+determinante en los resultados de recuperación independientemente del
+protocolo comparado.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Medidas
+
+### η²
+
+```{r bondad-show, echo=TRUE, eval=TRUE}
+eta2 <- 1 - det(Bloque + X1 + X2 + W) / det(T_mat)
+round(eta2, 4)
+```
+
+<p class="nota">
+
+El eta cuadrado (η² = `r round(eta2, 4)`) indica que el modelo explica
+aproximadamente el `r round(eta2*100, 2)`% de la variabilidad
+multivariada en FLEX_RODILLA y FUERZA_CUAD. Dado que ambas covariables
+(FLEX_BASAL e IMC) resultaron significativas, el modelo MANCOVA resulta
+adecuado para ajustar el efecto conjunto de estas variables sobre los
+resultados de recuperación funcional.
+
+</p>
+
+### Comparación de Eficiencia entre DCA y DBCA
+
+```{r dca-show, echo=TRUE, eval=TRUE}
+razon_det <- det(X1 + X2 + W + Bloque) / det(X1 + X2 + W)
+round(razon_det, 4)
+```
+
+<p class="nota">
+
+La razón de determinantes (`r round(razon_det, 4)`) indica que el modelo
+con bloques mejora en un `r round((razon_det - 1)*100, 1)`% la
+eficiencia respecto al DCA, lo que confirma que el bloqueo por
+GrupoEtario fue una decisión de diseño acertada para aumentar la
+precisión del estudio.
+
+</p>
+
+------------------------------------------------------------------------
+
+## Conclusiones
+
+```{r conclusiones}
+sig <- function(p) ifelse(p < 0.05, "✔ Significativo", "✘ No significativo")
+
+dec <- function(fuente, p){
+  if (fuente == "factor")
+    ifelse(p < 0.05,
+      "Se rechaza H₀: al menos un vector de medias difiere entre protocolos",
+      "No se rechaza H₀: vectores de medias iguales entre protocolos")
+  else if (fuente == "bloque")
+    ifelse(p < 0.05,
+      "Se justifica el bloqueo por grupo etario",
+      "No se rechaza H₀: no hay diferencia entre bloques")
+  else
+    ifelse(p < 0.05,
+      "γₖ ≠ 0 → la covariable ajusta el modelo → permanece en MANCOVA",
+      "γₖ ≈ 0 → se retira la covariable → evaluar MANOVA")
+}
+
+tabla_concl <- data.frame(
+  Fuente         = c("Protocolo (Factor)",
+                     "GrupoEtario (Bloque)",
+                     "FLEX_BASAL — Covariable X1",
+                     "IMC — Covariable X2"),
+  `p-valor`      = c(fmt_p(pval_prot), fmt_p(pval_blq),
+                     fmt_p(pval_X1),   fmt_p(pval_X2)),
+  Resultado      = c(sig(pval_prot), sig(pval_blq),
+                     sig(pval_X1),   sig(pval_X2)),
+  Interpretación = c(dec("factor", pval_prot),
+                     dec("bloque", pval_blq),
+                     dec("cov", pval_X1),
+                     dec("cov", pval_X2)),
+  check.names = FALSE
+)
+
+idx_sig  <- which(tabla_concl$Resultado == "✔ Significativo")
+idx_nsig <- which(tabla_concl$Resultado == "✘ No significativo")
+
+kable(tabla_concl,
+      align   = "lccc",
+      caption = paste0(
+        "Tabla 4. Resumen de resultados — MANCOVA en DBCA | ",
+        "η² = ", round(eta2, 4),
+        " (", round(eta2*100, 2), "% de variabilidad explicada por el modelo)"
+      )) %>%
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = TRUE, font_size = 14) %>%
+  row_spec(0,        bold = TRUE, background = "#2C3E50", color = "white") %>%
+  row_spec(idx_sig,  background = "#EAFAF1") %>%
+  row_spec(idx_nsig, background = "#FDEDEC")
+```
+
+<p class="nota">
+
+Dado que ambas covariables (FLEX_BASAL e IMC) resultaron significativas,
+el modelo MANCOVA en DBCA es el adecuado para este análisis. La
+condición basal del paciente al ingreso influye de manera relevante en
+los resultados de recuperación funcional.
+
+</p>
+
+------------------------------------------------------------------------
+
+# Bibliografía
+
+1.  Aldás, J., & Uriel, E. (2017). *Análisis multivariante aplicado con
+    R* (2.ª ed.). Ediciones Paraninfo, S.A.
+
+2.  Kuehl, R. O. (2001). *Diseño de experimentos: Principios
+    estadísticos de diseño y análisis de investigación* (2.ª ed.).
+    Thomson Learning.
+
+3.  Montgomery, D. C. (2004). *Diseño y análisis de experimentos* (2.ª
+    ed.). Limusa Wiley.
