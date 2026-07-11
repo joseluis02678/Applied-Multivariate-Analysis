@@ -11,9 +11,18 @@
 
 ---
 
-Bienvenido a esta colección de estudios de estadística multivariada aplicada. Este repositorio demuestra la implementación de diseños experimentales rigurosos (DCA, DBCA, Factoriales) y pruebas de hipótesis conjuntas, evaluando cómo múltiples factores afectan simultáneamente a un vector de variables respuesta.
+## <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/crosshair-16.svg" width="20" height="20" valign="middle"/> ¿Qué es este repositorio?
 
-### Integrantes del Equipo
+Este repositorio contiene la implementación de **proyectos aplicados de estadística multivariada** desarrollados durante el curso de Técnicas Multivariadas (UNALM, 2026-I). Cada proyecto resuelve problemas reales de negocio e investigación utilizando métodos avanzados para:
+
+- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/bar-chart-16.svg" width="18" height="18" valign="middle"/> **Comparar grupos** evaluando múltiples variables simultáneamente (MANOVA, Hotelling T²).
+- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/arrow-down-16.svg" width="18" height="18" valign="middle"/> **Reducir dimensionalidad** de datasets complejos (PCA, Análisis Factorial).
+- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/tag-16.svg" width="18" height="18" valign="middle"/> **Clasificar individuos** en categorías conocidas (Análisis Discriminante).
+- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/apps-16.svg" width="18" height="18" valign="middle"/> **Modelar variables categóricas** y de conteo (Regresión Logística Binaria, Multinomial, Ordinal y Poisson Robusta).
+
+---
+
+### <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/people-16.svg" width="20" height="20" valign="middle"/> Integrantes del Equipo
 
 *   **[@jonnathan2023](https://github.com/jonnathan2023)** — Jonathan Pedraza
 *   **[@AngelMol0810](https://github.com/AngelMol0810)** — Angel Meza
@@ -25,16 +34,16 @@ Bienvenido a esta colección de estudios de estadística multivariada aplicada. 
 
 ---
 
-### Arquitectura del Proyecto y Flujo de Evaluaciones
+### <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/sync-16.svg" width="20" height="20" valign="middle"/> Arquitectura del Proyecto y Flujo de Evaluaciones
 
 El siguiente esquema representa el pipeline analítico desarrollado a lo largo del ciclo, abarcando desde la inferencia inicial hasta el modelamiento predictivo avanzado.
 
 ```mermaid
 graph TD
     A[Data Raw & Preprocesamiento] --> B(PC1: Inferencia Multivariada)
-    B --> C(EC1: Reducción de Dimensionalidad)
+    B --> C(Parcial: Reducción de Dimensionalidad)
     C --> D(PC2: Clasificación Categórica)
-    D --> E(EF: Modelamiento Logístico Avanzado)
+    D --> E(Final: Modelamiento Logístico Avanzado)
     
     style A fill:#2d3436,stroke:#dfe6e9,stroke-width:2px,color:#fff
     style B fill:#0984e3,stroke:#74b9ff,stroke-width:2px,color:#fff
