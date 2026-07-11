@@ -1,8 +1,8 @@
 <div align="center">
+  <img src="logo.png" alt="Logo UNALM / Análisis Multivariado" width="200" />
   <h1><b>Análisis Multivariado Aplicado</b></h1>
   <h3>Universidad Nacional Agraria La Molina | Semestre 2026-I</h3>
   <p><i>Implementación de métodos estadísticos, extracción de características y reducción de dimensionalidad</i></p>
-
   <img src="https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white" alt="R" />
   <img src="https://img.shields.io/badge/Quarto-4C78B7?style=for-the-badge&logo=quarto&logoColor=white" alt="Quarto" />
   <img src="https://img.shields.io/badge/Data_Science-102A43?style=for-the-badge&logo=jupyter&logoColor=white" alt="Data Science" />
