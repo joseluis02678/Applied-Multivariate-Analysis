@@ -11,18 +11,18 @@
 
 ---
 
-## <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/crosshair-16.svg" width="20" height="20" valign="middle"/> ¿Qué es este repositorio?
+## 🎯 ¿Qué es este repositorio?
 
 Este repositorio contiene la implementación de **proyectos aplicados de estadística multivariada** desarrollados durante el curso de Técnicas Multivariadas (UNALM, 2026-I). Cada proyecto resuelve problemas reales de negocio e investigación utilizando métodos avanzados para:
 
-- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/bar-chart-16.svg" width="18" height="18" valign="middle"/> **Comparar grupos** evaluando múltiples variables simultáneamente (MANOVA, Hotelling T²).
-- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/arrow-down-16.svg" width="18" height="18" valign="middle"/> **Reducir dimensionalidad** de datasets complejos (PCA, Análisis Factorial).
-- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/tag-16.svg" width="18" height="18" valign="middle"/> **Clasificar individuos** en categorías conocidas (Análisis Discriminante).
-- <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/apps-16.svg" width="18" height="18" valign="middle"/> **Modelar variables categóricas** y de conteo (Regresión Logística Binaria, Multinomial, Ordinal y Poisson Robusta).
+- 📊 **Comparar grupos** evaluando múltiples variables simultáneamente (MANOVA, Hotelling T²).
+- 📉 **Reducir dimensionalidad** de datasets complejos (PCA, Análisis Factorial).
+- 🏷️ **Clasificar individuos** en categorías conocidas (Análisis Discriminante).
+- 🎲 **Modelar variables categóricas** y de conteo (Regresión Logística Binaria, Multinomial, Ordinal y Poisson Robusta).
 
 ---
 
-### <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/people-16.svg" width="20" height="20" valign="middle"/> Integrantes del Equipo
+### 👥 Integrantes del Equipo
 
 *   **[@jonnathan2023](https://github.com/jonnathan2023)** — Jonathan Pedraza
 *   **[@AngelMol0810](https://github.com/AngelMol0810)** — Angel Meza
@@ -34,7 +34,7 @@ Este repositorio contiene la implementación de **proyectos aplicados de estadí
 
 ---
 
-### <img src="https://cdn.jsdelivr.net/npm/@primer/octicons@latest/icons/sync-16.svg" width="20" height="20" valign="middle"/> Arquitectura del Proyecto y Flujo de Evaluaciones
+### 🔄 Arquitectura del Proyecto y Flujo de Evaluaciones
 
 El siguiente esquema representa el pipeline analítico desarrollado a lo largo del ciclo, abarcando desde la inferencia inicial hasta el modelamiento predictivo avanzado.
 
