@@ -27,6 +27,27 @@ Este examen parcial reúne siete proyectos de análisis multivariado de interdep
 
 ---
 
+## 🔄 Flujo Metodológico
+
+```mermaid
+flowchart LR
+    A[📥 7 Datasets reales/simulados] --> B{🔎 Tipo de variable}
+    B -->|Continua| C[ACP]
+    B -->|Mixta| D[FAMD]
+    B -->|Dicotómica| E[Correlación<br/>tetracórica]
+    B -->|Ordinal| F[Correlación<br/>policórica]
+    B -->|Tabla de contingencia| G[ACS]
+    C --> H{✅ Validación}
+    D --> H
+    E --> H
+    F --> H
+    G --> H
+    H --> I[KMO · Bartlett ·<br/>Omega de McDonald]
+    I --> J[💡 Insight de negocio]
+```
+
+---
+
 ## 📂 Casos de Estudio
 
 ### 1. Calidad del Café Arábica — Regresión Lineal Multivariada
@@ -106,7 +127,7 @@ Parcial/
 
 ---
 
-## 👨‍💻 Autor y Equipo
+## 👨‍💻 Autor
 
 **Jose Luis Garay Ramos**
 Estudiante de Estadística especializado en transformar datos complejos en análisis interpretables mediante metodologías estadísticas sólidas y programación en R/Python. En este proyecto lideré la integración y consolidación de las bases de datos, unificando los pipelines de análisis y estructurando el código del repositorio.
@@ -114,6 +135,26 @@ Estudiante de Estadística especializado en transformar datos complejos en anál
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jose-l-garay/)
 [![Correo](https://img.shields.io/badge/Correo-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:joseluisgarayramos23@gmail.com)
 
-**Equipo de Investigación (Grupo 1):** Meza Asto, Angel D. · Ormeño Sakihama, Daniel Kenyi · Ancco Guzman, Melany Alexandra · Pedraza Laboriano, Jonnathan · Fuentes Bueno, Fiorella · Sobero Aguirre, Fiorella Romina
+### 👥 Equipo de Investigación — Grupo 1
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center" width="180"><b>Jose Luis Garay Ramos</b><br><sub>Integración de datos ·<br>Estructuración del repo</sub></td>
+<td align="center" width="180"><b>Angel D. Meza Asto</b></td>
+<td align="center" width="180"><b>Daniel Kenyi<br>Ormeño Sakihama</b></td>
+</tr>
+<tr>
+<td align="center" width="180"><b>Melany Alexandra<br>Ancco Guzman</b></td>
+<td align="center" width="180"><b>Jonnathan<br>Pedraza Laboriano</b></td>
+<td align="center" width="180"><b>Fiorella<br>Fuentes Bueno</b></td>
+</tr>
+<tr>
+<td align="center" width="180" colspan="3"><b>Fiorella Romina<br>Sobero Aguirre</b></td>
+</tr>
+</table>
+
+</div>
 
 ---
