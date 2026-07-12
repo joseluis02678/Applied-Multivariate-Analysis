@@ -1,6 +1,6 @@
 <div align="center">
 
-# Análisis de Correspondencia y Discriminante Multivariado 🔍
+## Análisis de Correspondencia y Discriminante Multivariado 🔍
 
 ![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
 ![Quarto](https://img.shields.io/badge/Quarto-4C78B7?style=for-the-badge&logo=quarto&logoColor=white)
