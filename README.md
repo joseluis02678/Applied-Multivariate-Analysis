@@ -1,7 +1,3 @@
-cd ~/Desktop/Multivariadas
-
-# Crear el archivo README.md con el contenido profesional
-cat > README.md << 'EOF'
 <div align="center">
   <img src="logo.png" alt="Logo UNALM / Análisis Multivariado" width="200" />
   <h1><b>Análisis Multivariado Aplicado</b></h1>
