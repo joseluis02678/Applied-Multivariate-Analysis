@@ -27,6 +27,28 @@ Este repositorio reúne cinco proyectos de modelamiento de regresión sobre vari
 
 ---
 
+## 🔄 Flujo Metodológico
+
+```mermaid
+flowchart LR
+    A[📥 5 Datasets reales] --> B{🔎 Naturaleza de la<br/>variable respuesta}
+    B -->|Binaria| C[Logística Binaria]
+    B -->|Binaria + prevalencia alta| D[Log-Binomial]
+    B -->|Conteo| E[Poisson Robusta]
+    B -->|Multinomial| F[Logística<br/>Multinomial]
+    B -->|Ordinal| G[Logística Ordinal]
+    C --> H{✅ Diagnóstico}
+    D --> H
+    E --> H
+    F --> H
+    G --> H
+    H --> I[VIF · Brant ·<br/>Hosmer-Lemeshow]
+    I --> J[📊 OR / RR / IRR]
+    J --> K[💡 Insight de negocio]
+```
+
+---
+
 ## 📂 Casos de Estudio
 
 ### 1. Retención Estudiantil — Regresión Logística Binaria
@@ -127,7 +149,7 @@ Applied-Multivariate-Analysis/Final
 
 ---
 
-## 👨‍💻 Autor y Equipo
+## 👨‍💻 Autor
 
 **Jose Luis Garay Ramos**
 Estudiante de Estadística especializado en transformar datos complejos en análisis interpretables mediante metodologías estadísticas sólidas y programación en R/Python. En este proyecto lideré la integración y consolidación de las bases de datos, unificando los pipelines de análisis y estructurando el código del repositorio.
@@ -135,6 +157,26 @@ Estudiante de Estadística especializado en transformar datos complejos en anál
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jose-l-garay/)
 [![Correo](https://img.shields.io/badge/Correo-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:joseluisgarayramos23@gmail.com)
 
-**Equipo de Investigación (Grupo 1):** Meza Asto, Angel D. · Ormeño Sakihama, Daniel Kenyi · Ancco Guzman, Melany Alexandra · Pedraza Laboriano, Jonnathan · Fuentes Bueno, Fiorella · Sobero Aguirre, Fiorella Romina
+### 👥 Equipo de Investigación — Grupo 1
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center" width="180"><b>Jose Luis Garay Ramos</b><br><sub>Integración de datos ·<br>Estructuración del repo</sub></td>
+<td align="center" width="180"><b>Angel D. Meza Asto</b></td>
+<td align="center" width="180"><b>Daniel Kenyi<br>Ormeño Sakihama</b></td>
+</tr>
+<tr>
+<td align="center" width="180"><b>Melany Alexandra<br>Ancco Guzman</b></td>
+<td align="center" width="180"><b>Jonnathan<br>Pedraza Laboriano</b></td>
+<td align="center" width="180"><b>Fiorella<br>Fuentes Bueno</b></td>
+</tr>
+<tr>
+<td align="center" width="180" colspan="3"><b>Fiorella Romina<br>Sobero Aguirre</b></td>
+</tr>
+</table>
+
+</div>
 
 ---
