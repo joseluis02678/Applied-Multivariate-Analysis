@@ -27,6 +27,28 @@ Este repositorio reúne seis proyectos de inferencia y diseño experimental mult
 
 ---
 
+## 🔄 Flujo Metodológico
+
+```mermaid
+flowchart LR
+    A[📥 6 Datasets reales] --> B{🔎 Diagnóstico de supuestos}
+    B --> C[Normalidad multivariada<br/>Mardia · Henze-Zirkler · Doornik-Hansen]
+    B --> D[Homogeneidad de covarianzas<br/>M de Box]
+    C --> E{⚙️ Selección de prueba}
+    D --> E
+    E --> F[Z² Multivariada]
+    E --> G[T² de Hotelling]
+    E --> H[MANOVA / MANOVA Factorial]
+    E --> I[MANCOVA]
+    F --> J[📈 Tamaño de efecto η²]
+    G --> J
+    H --> J
+    I --> J
+    J --> K[💡 Insight de negocio]
+```
+
+---
+
 ## 📂 Casos de Estudio
 
 ### 1. Calidad de Agua en Ecosistemas Andinos — Prueba Z² Multivariada
@@ -119,7 +141,7 @@ Applied-Multivariate-Analysis/PC1
 
 ---
 
-## 👨‍💻 Autor y Equipo
+## 👨‍💻 Autor
 
 **Jose Luis Garay Ramos**
 Estudiante de Estadística especializado en transformar datos complejos en análisis interpretables mediante metodologías estadísticas sólidas y programación en R/Python. En este proyecto lideré la integración y consolidación de las bases de datos, unificando los pipelines de análisis y estructurando el código del repositorio.
@@ -127,6 +149,26 @@ Estudiante de Estadística especializado en transformar datos complejos en anál
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jose-l-garay/)
 [![Correo](https://img.shields.io/badge/Correo-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:joseluisgarayramos23@gmail.com)
 
-**Equipo de Investigación (Grupo 1):** Meza Asto, Angel D. · Ormeño Sakihama, Daniel Kenyi · Ancco Guzman, Melany Alexandra · Pedraza Laboriano, Jonnathan · Fuentes Bueno, Fiorella · Sobero Aguirre, Fiorella Romina
+### 👥 Equipo de Investigación — Grupo 1
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center" width="180"><b>Jose Luis Garay Ramos</b><br><sub>Integración de datos ·<br>Estructuración del repo</sub></td>
+<td align="center" width="180"><b>Angel D. Meza Asto</b></td>
+<td align="center" width="180"><b>Daniel Kenyi<br>Ormeño Sakihama</b></td>
+</tr>
+<tr>
+<td align="center" width="180"><b>Melany Alexandra<br>Ancco Guzman</b></td>
+<td align="center" width="180"><b>Jonnathan<br>Pedraza Laboriano</b></td>
+<td align="center" width="180"><b>Fiorella<br>Fuentes Bueno</b></td>
+</tr>
+<tr>
+<td align="center" width="180" colspan="3"><b>Fiorella Romina<br>Sobero Aguirre</b></td>
+</tr>
+</table>
+
+</div>
 
 ---
