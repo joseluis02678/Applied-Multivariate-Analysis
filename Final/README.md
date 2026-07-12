@@ -8,7 +8,7 @@
 
 *Cinco modelos de regresión aplicados a problemas reales de retención estudiantil, riesgo crediticio, salud pública y selección de talento — eligiendo en cada caso la técnica estadísticamente apropiada según la naturaleza de la variable respuesta.*
 
-**[📄 Ver informe completo](./notebooks/Final%20-%20Grupo%201.qmd)** · **[💼 LinkedIn](https://www.linkedin.com/in/jose-l-garay/)**
+**[📄 Ver informe completo](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Final/Final%20-%20Grupo%201.html)** · **[💼 LinkedIn](https://www.linkedin.com/in/jose-l-garay/)**
 
 </div>
 
