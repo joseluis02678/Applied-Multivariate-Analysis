@@ -1,9 +1,3 @@
-<div align="center">
-
-<img src="logo.png" alt="Logo UNALM" width="140"/>
-
-# Análisis Multivariado Aplicado
-
 ### Primera Evaluación Continua — Técnicas Multivariadas
 
 *Universidad Nacional Agraria La Molina | Semestre 2026-I*
