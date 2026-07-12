@@ -1,3 +1,7 @@
+cd ~/Desktop/Multivariadas
+
+# Crear el archivo README.md con el contenido profesional
+cat > README.md << 'EOF'
 <div align="center">
   <img src="logo.png" alt="Logo UNALM / Análisis Multivariado" width="200" />
   <h1><b>Análisis Multivariado Aplicado</b></h1>
@@ -22,7 +26,20 @@ Este repositorio contiene la implementación de **proyectos aplicados de estadí
 
 ---
 
-### 👥 Integrantes del Equipo
+## 📑 Informes Interactivos
+
+Accede directamente a los informes renderizados en GitHub Pages:
+
+| Evaluación | Tema Principal | Informe HTML |
+|------------|----------------|--------------|
+| **PC1** | Inferencia Multivariada (Z², Hotelling T², MANOVA, MANCOVA) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/PC1/PC1%20-%20Grupo%201.html) |
+| **Parcial** | Reducción de Dimensionalidad (PCA, Análisis Factorial) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Parcial/grupo1_EVC_completo.html) |
+| **PC2** | Clasificación Categórica (Regresión Logística) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/PC2/Pr%C3%A1ctica_Calificada02_Grupo01.html) |
+| **Final** | Modelamiento Logístico Avanzado | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Final/Final%20-%20Grupo%201.html) |
+
+---
+
+## 👥 Integrantes del Equipo
 
 *   **[@jonnathan2023](https://github.com/jonnathan2023)** — Jonathan Pedraza
 *   **[@AngelMol0810](https://github.com/AngelMol0810)** — Angel Meza
@@ -31,6 +48,37 @@ Este repositorio contiene la implementación de **proyectos aplicados de estadí
 *   **[@fiorellasob](https://github.com/fiorellasob)** — Fiorella Sobero
 *   **Melany Alexandra Ancco Guzman** *(Colaboradora)*
 *   **Fiorella Fuentes Bueno** *(Colaboradora)*
+
+---
+
+## 📂 Estructura del Repositorio
+
+```
+Applied-Multivariate-Analysis/
+├── PC1/
+│   ├── PC1 - Grupo 1.qmd
+│   ├── PC1 - Grupo 1.html
+│   ├── README.md
+│   └── data/
+├── Parcial/
+│   ├── grupo1_EVC_completo.qmd
+│   ├── grupo1_EVC_completo.html
+│   └── data/
+├── PC2/
+│   ├── Práctica_Calificada02_Grupo01.qmd
+│   ├── Práctica_Calificada02_Grupo01.html
+│   └── data/
+├── Final/
+│   ├── Final - Grupo 1.qmd
+│   ├── Final - Grupo 1.html
+│   ├── Codigo_Completo_Final.R
+│   ├── modelo_logit.rds
+│   ├── modelo_logbinomial.rds
+│   └── data/
+├── .gitignore
+├── README.md
+└── logo.png
+```
 
 ---
 
