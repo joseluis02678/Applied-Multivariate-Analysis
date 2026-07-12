@@ -1,8 +1,5 @@
-### Primera Evaluación Continua — Técnicas Multivariadas
 
-*Universidad Nacional Agraria La Molina | Semestre 2026-I*
-
-*Reducción de dimensionalidad, modelos factoriales y análisis de correspondencia aplicados a casos reales*
+### *Reducción de dimensionalidad, modelos factoriales y análisis de correspondencia aplicados a casos reales*
 
 ![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)
 ![Quarto](https://img.shields.io/badge/Quarto-4C78B7?style=for-the-badge&logo=quarto&logoColor=white)
@@ -16,14 +13,13 @@
 
 Este examen parcial reúne seis técnicas de análisis multivariado de interdependencia aplicadas sobre seis conjuntos de datos distintos, reales y simulados. El hilo conductor es la reducción de dimensionalidad y la identificación de estructuras latentes bajo distintos supuestos de medida: variables continuas, mixtas, dicotómicas, ordinales y categóricas puras.
 
-| # | Técnica | Dataset / Caso |
-|---|---|---|
-| 1 | Regresión Lineal Multivariada | Calidad química del café arábica (selva alta peruana) |
-| 2 | Análisis de Componentes Principales (ACP) | Ahorro agregado — `LifeCycleSavings` (50 países) |
-| 3 | Análisis Factorial Clásico (AFC) | Desempeño escolar — Colegio Trilce, Lima |
-| 4 | Análisis Factorial de Datos Mixtos (FAMD) | Bienestar laboral — empresa de tecnología |
-| 5 | Análisis Factorial Dicotómico / Ordinal | Hábitos de consumo digital / Constructo organizacional |
-| 6 | Análisis de Correspondencia Simple (ACS) | Estrés laboral y estrategias de afrontamiento |
+- Regresión Lineal Multivariada
+- Análisis de Componentes Principales (ACP)
+- Análisis Factorial Clásico (AFC)
+- Análisis Factorial de Datos Mixtos (FAMD)
+- Análisis Factorial Dicotómico
+- Análisis Factorial Ordinal
+- Análisis de Correspondencia Simple (ACS)
 
 📄 **Ver informe completo:** [grupo1_EVC_completo.html](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Parcial/grupo1_EVC_completo.html)
 
@@ -154,8 +150,6 @@ Instrumento de 15 ítems (n = 250) sobre Proactividad, Liderazgo y Empatía. Cor
 - **Fuentes Bueno, Fiorella**
 - **Garay Ramos, Jose Luis**
 - **Sobero Aguirre, Fiorella Romina**
-
-**Docente:** Miranda Villagómez, Clodomiro Fernando
 
 ---
 
