@@ -29,108 +29,103 @@ Applied-Multivariate-Analysis/PC2
 └── ⚙️ .gitignore                     
 ```
 
+
 ---
 
 ### 📂 Casos de Estudio y Arquitectura de Datos
 
-#### 1. Análisis de Correspondencia Simple (ACS)
-* **Contexto:** Exploración de patrones de asociación entre variables categóricas mediante descomposición de inercia en tablas de contingencia.
-* **Dataset:** `datos.xlsx`
-* **Metodología:**
-  * Construcción de tablas de contingencia
-  * Cálculo de perfiles fila y columna
-  * Descomposición en valores singulares (SVD)
-  * Proyección en espacios de baja dimensión
-* **Técnicas:**
-  * Prueba de independencia Chi-cuadrado preliminar
-  * Scree plot para selección de dimensiones
-  * Biplot de perfiles activos y suplementarios
-  * Tablas de contribución (CTR) y calidad de representación (COS)
-* **Interpretación:** Identificación de categorías que más contribuyen a la inercia total y patrones de atracción/repulsión en el espacio factorial.
-
-#### 2. Análisis de Correspondencia Múltiple (ACM)
-* **Contexto:** Análisis simultáneo de múltiples variables categóricas para identificar estructuras latentes en hogares peruanos.
-* **Dataset:** `Enaho01-2025-100.csv` (Encuesta Nacional de Hogares - ENAHO 2025)
-* **Metodología:**
-  * Codificación disyuntiva completa (indicator matrix)
-  * Análisis de nube de individuos y variables
-  * Extracción de componentes principales categóricos
-* **Técnicas:**
-  * Cálculo de inercia explicada por dimensión
-  * Coordenadas principales estandarizadas
-  * Gráficos de individuos y variables en espacios factoriales
-* **Aplicación:** Segmentación de hogares peruanos según características socioeconómicas, identificación de patrones de vulnerabilidad y bienestar.
-
-#### 3. Análisis Discriminante Lineal (Datos Balanceados)
-* **Contexto:** Construcción de funciones discriminantes para clasificar individuos en grupos conocidos con diseño balanceado, aplicado a diagnóstico clínico de hipocalcemia.
-* **Dataset:** `Dataset_Hipocalcemia_4.xlsx`
+#### 1. Análisis de Correspondencia Simple (ACS) — Posicionamiento de Marca Perú
+* **Contexto:** Evaluación del posicionamiento de Cuzco como "Marca Perú" frente a potencias turísticas globales (París, Tokio, Madrid, CDMX, Nueva York), identificando qué atributos percibe el viajero internacional.
+* **Dataset:** `datos.xlsx` (2,451 encuestas a viajeros reales + 558 encuestas de "Destino Ideal")
 * **Variables:**
-  * *Variable respuesta:* Grupo de hipocalcemia (categorías definidas)
-  * *Predictores:* Variables clínicas y bioquímicas continuas
+  * *Filas (Atributos):* Gastronomía, Historia, Fiesta, Seguridad, Costo, Arquitectura
+  * *Columnas (Destinos):* París, Tokio, Madrid, Cuzco, CDMX, Nueva York + Destino_Ideal (suplementario)
 * **Metodología:**
-  * Verificación de supuestos: Normalidad multivariada, homogeneidad de matrices de covarianza (M de Box)
-  * Cálculo de funciones discriminantes canónicas
-  * Evaluación de poder discriminante (Lambda de Wilks, Chi-cuadrado)
-* **Técnicas:**
-  * Coeficientes discriminantes estandarizados
-  * Correlaciones canónicas
-  * Matriz de clasificación (accuracy, sensibilidad, especificidad)
-  * Validación cruzada (leave-one-out)
-* **Impacto:** Desarrollo de reglas de diagnóstico clínico basadas en perfiles bioquímicos.
+  * Construcción de tabla de contingencia (Atributos × Destinos)
+  * Prueba Chi-cuadrado de independencia preliminar (χ² = 284.75, p < 0.001)
+  * Descomposición en valores singulares (SVD) con retención de 2 dimensiones (88.79% de inercia)
+  * Proyección del "Destino Ideal" como columna suplementaria
+* **Hallazgo clave:** Cuzco se posiciona como "Destino Cultural-Económico" (Historia + Gastronomía), alejado del vector de Seguridad que domina Tokio. El Destino Ideal cae en el origen, revelando que el turista busca equilibrio multidimensional perfecto.
 
-#### 4. Análisis Discriminante Lineal (Datos Desbalanceados)
-* **Contexto:** Clasificación en escenarios con tamaños muestrales desiguales entre grupos.
-* **Dataset:** Variante del dataset de hipocalcemia con distribución no balanceada
-* **Desafíos:**
-  * Sesgo hacia grupos mayoritarios
-  * Estimación inestable de matrices de covarianza en grupos pequeños
-* **Estrategias:**
-  * Ponderación por tamaños muestrales
-  * Análisis de funciones discriminantes robustas
-  * Evaluación de tasas de error por grupo (no solo global)
-* **Métricas:**
-  * Sensibilidad y especificidad por clase
-  * Curvas ROC multiclase
-  * Índice Kappa de Cohen para acuerdo más allá del azar
+#### 2. Análisis de Correspondencia Múltiple (ACM) — Brechas de Habitabilidad en Perú
+* **Contexto:** Mapeo de las brechas estructurales de habitabilidad en el Perú utilizando microdatos de la Encuesta Nacional de Hogares (ENAHO) 2025, Módulo 100.
+* **Dataset:** `Enaho01-2025-100.csv` (n = 33,333 hogares)
+* **Variables (5 variables × 3 categorías = 15 categorías):**
+  * `Estrato`: Urb:Grande, Urb:Pequeño, Rural
+  * `Paredes`: Par:Noble, Par:Mixto, Par:Precario
+  * `Pisos`: Pis:Fino, Pis:Basico, Pis:Tierra
+  * `Agua`: Agua:Red, Agua:Basico, Agua:Precario
+  * `Baño`: Baño:Red, Baño:Basico, Baño:Precario
+* **Metodología:**
+  * Construcción de Matriz Disyuntiva Completa (Z: 33,333 × 15) y Tabla de Burt (B: 15 × 15)
+  * Retención de 2 dimensiones (41.5% de inercia total)
+  * Verificación bivariada con 10 pruebas Chi-cuadrado (todas p < 0.001)
+* **Hallazgo clave:** La Dimensión 1 (27.7%) captura la brecha urbano-rural: `Urb:Grande + Par:Noble + Pis:Fino + Baño:Red` vs `Rural + Par:Mixto + Pis:Tierra + Baño:Precario`. El saneamiento (`Baño`) es la variable con mayor poder discriminante (V de Cramer = 0.44).
+
+#### 3. Análisis Discriminante Lineal (Datos Balanceados) — Estado Nutricional Infantil
+* **Contexto:** Clasificación del estado nutricional de 150 niños (5-12 años) en comunidades rurales del Perú según variables antropométricas y bioquímicas.
+* **Dataset:** Datos simulados con diseño perfectamente balanceado (n = 50 por grupo)
+* **Variables:**
+  * *Respuesta:* `estado` (Normal, Riesgo, Desnutrición)
+  * *Predictores:* `talla_z`, `peso_z`, `hemoglobi`, `albumina`, `imc`
+* **Metodología:**
+  * División 70/30 estratificada (105 entrenamiento, 45 prueba)
+  * Verificación de supuestos: Shapiro-Wilk multivariado, Box M (homogeneidad), ANOVA univariado
+  * Selección de variables: Lambda de Wilks stepwise, Boruta, Random Forest
+  * Evaluación con métricas robustas: Accuracy, Kappa, ROC one-vs-one
+* **Hallazgo clave:** LD1 captura el gradiente Normal → Riesgo → Desnutrición. AUC = 1.000 para Normal vs Desnutrición (discriminación perfecta). Accuracy ≈ 0.93-0.97 con Kappa > 0.80.
+
+#### 4. Análisis Discriminante Lineal (Datos Desbalanceados) — Hipocalcemia Bovina
+* **Contexto:** Detección temprana de hipocalcemia periparto en 1,000 vacas Holstein, con prevalencia del 10% (900 sanas vs 100 enfermas).
+* **Dataset:** `Dataset_Hipocalcemia_4.xlsx` (desbalance 90/10)
+* **Variables:**
+  * *Respuesta:* `Hipocalcemia` (no / si)
+  * *Predictores:* `Anios_produccion`, `Partos_promedio_anual`, `Produccion_leche_L`, `Peso_kg`, `Calcio_preparto_mg`, `Magnesio_preparto_mg`
+* **Desafíos del desbalance:**
+  * Accuracy engañoso (modelo trivial alcanzaría 90%)
+  * Priorización de métricas robustas: Sensibilidad, F1, MCC, AUC, CSI, ETS
+* **Hallazgo clave:** `Calcio_preparto_mg` es el marcador individual más fuerte (r_s = -0.784 con LD1). AUC = 0.868 (discriminación buena), pero con umbral 0.5 la sensibilidad es solo 0.267. Se recomienda reducir el umbral a ~0.25-0.30 o aplicar técnicas de balanceo (ROSE/SMOTE).
 
 ---
 
 ### 🛠️ Stack Tecnológico
 * **Lenguaje:** R
-* **Análisis de Correspondencia:** `FactoMineR`, `ca`, `ggbiplot`
-* **Análisis Discriminante:** `MASS` (lda), `candisc`, `heplots`
-* **Manipulación y Visualización:** `tidyverse`, `dplyr`, `ggplot2`, `corrplot`
-* **Validación y Métricas:** `caret`, `pROC`, `e1071`
-* **Reportes:** Quarto / RMarkdown (`knitr`, `kableExtra`)
+* **Análisis de Correspondencia:** `FactoMineR`, `ca`, `anacor`, `factoextra`, `vegan`, `FactoClass`
+* **Análisis Discriminante:** `MASS` (lda), `klaR` (greedy.wilks), `biotools` (Box M), `mvnormtest`
+* **Manipulación y Visualización:** `tidyverse`, `dplyr`, `ggplot2`, `GGally`, `corrplot`, `Hmisc`
+* **Validación y Métricas:** `caret`, `caTools` (colAUC), `pROC`, `psych` (Kappa), `EnvStats` (Rosner)
+* **Selección de Variables:** `Boruta`, `randomForest`, `vip`
+* **Reportes:** Quarto / RMarkdown (`knitr`, `kableExtra`, `gtsummary`)
 
 ---
 
 ### 💡 Flujo de Trabajo (Pipeline)
 
 #### Para Análisis de Correspondencia:
-1. **Preparación:** Construcción de tabla de contingencia, cálculo de frecuencias esperadas
+1. **Preparación:** Construcción de tabla de contingencia / Matriz Disyuntiva Completa / Tabla de Burt
 2. **Diagnóstico:** Prueba Chi-cuadrado de independencia, análisis de residuos estandarizados
-3. **Descomposición:** SVD de la matriz de residuos normalizados
+3. **Descomposición:** SVD de la matriz de residuos normalizados (ACS) o diagonalización de Tabla de Burt (ACM)
 4. **Interpretación:** 
-   - Selección de dimensiones (inercia acumulada > 80%)
-   - Análisis de contribuciones (CTR > 1/k)
-   - Calidad de representación (COS > 0.8)
-5. **Visualización:** Biplots con etiquetas de categorías activas y suplementarias
+   - Selección de dimensiones (regla del codo + inercia acumulada)
+   - Análisis de contribuciones (CTR) y calidad de representación (cos²)
+   - v.test para significancia de categorías
+5. **Visualización:** Biplots con categorías activas y suplementarias, mapas factoriales coloreados por contribución
 
 #### Para Análisis Discriminante:
-1. **Exploración:** Estadísticos descriptivos por grupo, matriz de correlaciones
-2. **Validación de Supuestos:**
-   - Normalidad multivariada (Shapiro-Wilk, Mardia)
+1. **Exploración:** Estadísticos descriptivos por grupo, matriz de correlaciones, ggpairs
+2. **Detección de Outliers:** Tukey (univariado), Mahalanobis (multivariado), Rosner (ESD)
+3. **Validación de Supuestos:**
+   - Normalidad multivariada (Shapiro-Wilk multivariado, Mardia, Henze-Zirkler)
    - Homogeneidad de covarianzas (M de Box)
-   - Ausencia de multicolinealidad (VIF < 10)
-3. **Modelado:**
-   - Cálculo de funciones discriminantes canónicas
-   - Evaluación de significancia (Lambda de Wilks)
-   - Estructura de cargas (correlaciones intra-set)
-4. **Clasificación:**
-   - Asignación por distancia de Mahalanobis a centroides
-   - Matriz de confusión y métricas de desempeño
-   - Validación cruzada para estimar error real
+   - Poder discriminante individual (ANOVA univariado)
+4. **Modelado:**
+   - Cálculo de funciones discriminantes canónicas (LD1, LD2)
+   - Lambda de Wilks (individual y conjunto vía MANOVA)
+   - Coeficientes estandarizados y Matriz de Estructura
+5. **Clasificación y Evaluación:**
+   - Matriz de confusión, Accuracy, Kappa de Cohen
+   - Curvas ROC one-vs-one y AUC
+   - Métricas robustas para desbalance: F1, MCC, CSI, ETS
 
 ---
 
@@ -138,11 +133,13 @@ Applied-Multivariate-Analysis/PC2
 
 | Técnica | Métrica Principal | Umbral Aceptable |
 |---------|-------------------|------------------|
-| **ACS/ACM** | Inercia explicada acumulada | ≥ 70-80% |
-| **ACS/ACM** | Calidad de representación (COS) | ≥ 0.80 |
+| **ACS/ACM** | Inercia explicada acumulada | ≥ 40% (ACM) / 80% (ACS) |
+| **ACS/ACM** | Calidad de representación (cos²) | ≥ 0.80 |
 | **Discriminante** | Lambda de Wilks | p < 0.05 |
 | **Discriminante** | Tasa de clasificación correcta | ≥ 75% |
 | **Discriminante** | Kappa de Cohen | ≥ 0.60 |
+| **Discriminante (desbalance)** | AUC | ≥ 0.80 |
+| **Discriminante (desbalance)** | MCC | ≥ 0.30 |
 
 ---
 
