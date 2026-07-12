@@ -17,8 +17,8 @@ Este repositorio contiene la implementación de **proyectos aplicados de estadí
 
 - 📊 **Comparar grupos** evaluando múltiples variables simultáneamente (MANOVA, Hotelling T²).
 - 📉 **Reducir dimensionalidad** de datasets complejos (PCA, Análisis Factorial).
-- 🏷️ **Clasificar individuos** en categorías conocidas (Análisis Discriminante).
-- 🎲 **Modelar variables categóricas** y de conteo (Regresión Logística Binaria, Multinomial, Ordinal y Poisson Robusta).
+- ️ **Clasificar individuos** en categorías conocidas (Análisis Discriminante).
+-  **Modelar variables categóricas** y de conteo (Regresión Logística Binaria, Multinomial, Ordinal y Poisson Robusta).
 
 ---
 
@@ -30,12 +30,12 @@ Accede directamente a los informes renderizados en GitHub Pages:
 |------------|----------------|--------------|
 | **PC1** | Inferencia Multivariada (Z², Hotelling T², MANOVA, MANCOVA) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/PC1/PC1%20-%20Grupo%201.html) |
 | **Parcial** | Reducción de Dimensionalidad (PCA, Análisis Factorial) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Parcial/grupo1_EVC_completo.html) |
-| **PC2** | Clasificación Categórica (Regresión Logística) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/PC2/Pr%C3%A1ctica_Calificada02_Grupo01.html) |
-| **Final** | Modelamiento Logístico Avanzado | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Final/Final%20-%20Grupo%201.html) |
+| **PC2** | Análisis de Correspondencia y Discriminante (ACS, ACM, ADL) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/PC2/Práctica_Calificada02_Grupo01.html) |
+| **Final** | Modelamiento Logístico Avanzado (Regresión Logística Binaria, Multinomial, Ordinal) | [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Final/Final%20-%20Grupo%201.html) |
 
 ---
 
-## 👥 Integrantes del Equipo
+##  Integrantes del Equipo
 
 *   **[@jonnathan2023](https://github.com/jonnathan2023)** — Jonathan Pedraza
 *   **[@AngelMol0810](https://github.com/AngelMol0810)** — Angel Meza
