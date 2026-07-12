@@ -14,18 +14,18 @@ Ir más allá del análisis univariado tradicional aislando fuentes de variabili
 ### 📁 Estructura del Repositorio
 
 ```text
-🚀 Applied-Multivariate-Analysis
+🚀 Applied-Multivariate-Analysis/PC1
 │
 ├── 📖 README.md             
 ├── 📂 notebooks/            
-│   └── 🧪 Diseno-de-Experimentos-Multivariados-MANOVA.qmd    
+│   └── 🧪 PC1 - Grupo 1.qmd    
 │
 ├── 📂 data/                  
-│   ├── 💧 Calidad_Agua.xlsx
-│   ├── 🧠 Neuropsicologia.xlsx
-│   ├── 🥑 Palta_data.csv
-│   ├── 🥔 Papa_manova.csv
-│   └── 🐄 Vacas_PC1.csv
+│   ├── 💧 Dataset_CalidadAgua_Andina_2017_2019.xlsx
+│   ├── 🧠 datos_neuropsico.xlsx
+│   ├── 🥑 base_de_datos_palta.csv
+│   ├── 🥔 datos_manova_papa.csv
+│   └── 🐄 Data_Final_Vacas_PC1.csv
 │
 ├── 📂 scripts/               
 └── ⚙️ .gitignore             
@@ -34,7 +34,7 @@ Ir más allá del análisis univariado tradicional aislando fuentes de variabili
 ### 📂 Casos de Estudio y Arquitectura de Datos
 
 #### 1. Calidad de Agua en Ecosistemas Andinos (Prueba Z² Multivariada)
-* **Contexto:** Evaluación ambiental de cuencas hidrográficas peruanas (2017-2019) contrastando muestras recientes con parámetros históricos.
+* **Contexto:** Evaluación ambiental de cuencas hidrográficas peruanas (Apurímac, Áncash, Cusco y Junín) durante el periodo 2017-2019, contrastando muestras de 2019 con parámetros históricos consolidados (2017-2018).
 * **Dataset:** `Dataset_CalidadAgua_Andina_2017_2019.xlsx`
 * **Diccionario de Variables:** 
   * `pH` (Acidez/Alcalinidad)
@@ -42,70 +42,97 @@ Ir más allá del análisis univariado tradicional aislando fuentes de variabili
   * `Oxigeno_Disuelto_mgL` (Viabilidad acuática)
   * `Conductividad_uScm` (Sales disueltas)
 * **Técnicas:** Prueba Z² con matriz de covarianza poblacional conocida, estimación de distancias de Mahalanobis e Intervalos de Confianza Simultáneos de Bonferroni.
+* **Hallazgo clave:** La **Turbidez** es el factor crítico de degradación, responsable del **63.7%** de la variación total detectada. El Z² calculado (284.31) supera ampliamente al crítico (9.48), rechazando contundentemente H₀ (p < 0.0001).
 
 #### 2. Eficacia de Rehabilitación Neuropsicológica (T² de Hotelling - Muestras Dependientes)
-* **Contexto:** Evaluación clínica pre y post tratamiento de pacientes con déficit atencional leve tras 8 semanas de intervención.
+* **Contexto:** Evaluación clínica pre y post tratamiento de 35 pacientes con déficit atencional leve tras un programa de 8 semanas combinando mindfulness, entrenamiento de memoria de trabajo y estimulación cognitiva computarizada.
 * **Dataset:** `datos_neuropsico.xlsx` (Hoja 2)
 * **Diccionario de Variables:**
   * `sostenida` (Tiempo de concentración en segundos)
   * `memoria` (Puntaje de memoria de trabajo)
   * `atencion` (Puntaje de atención selectiva)
   * `momento` (Factor temporal: Antes / Después)
-* **Técnicas:** Análisis de la matriz de diferencias, evaluación de normalidad de variaciones conjuntas.
+* **Vector de metas clínicas:** (20 s, 5 pts, 3 pts)
+* **Técnicas:** Análisis de la matriz de diferencias, pruebas de normalidad multivariada (Mardia, Henze-Zirkler, Doornik-Hansen), detección de outliers multivariados.
+* **Hallazgo clave:** La prueba T² de Hotelling **no rechaza H₀** (p = 0.447), confirmando que el programa produce cambios que se ajustan perfectamente a las metas clínicas establecidas.
 
 #### 3. Perfilamiento de Variedades de Palta (T² de Hotelling - Muestras Independientes)
-* **Contexto:** Comparación de atributos físico-composicionales entre las variedades comerciales Hass y Fuerte.
+* **Contexto:** Comparación de atributos físico-composicionales entre las variedades comerciales Hass y Fuerte, evaluando si las diferencias observadas coinciden con el vector esperado.
 * **Dataset:** `base_de_datos_palta.csv`
 * **Diccionario de Variables:**
   * `Especie` (Factor: Hass / Fuerte)
   * *Vector respuesta:* `DiametroSemilla` (mm), `PesoFruto` (g), `ContenidoAceite` (%), `Firmeza` (N)
-* **Técnicas:** Contraste de vectores de medias independientes, validación de homogeneidad de covarianzas (M de Box).
+* **Vector hipotético (μ₀):** (-3, -20, -4, 5)ᵀ → Hass tiene semilla 3mm más pequeña, pesa 20g menos, 4% menos aceite y 5N más firme.
+* **Técnicas:** Contraste de vectores de medias independientes, validación de homogeneidad de covarianzas (M de Box), intervalos de confianza simultáneos.
+* **Hallazgo clave:** Con p = 0.6395, no se rechaza H₀. Los datos son **totalmente compatibles** con el vector especificado, confirmando el perfil diferenciado entre variedades.
 
 #### 4. Morfología Genética en DCA (MANOVA de una vía)
-* **Contexto:** Efecto de cuatro variedades de papa (*Solanum tuberosum*) sobre el desarrollo estructural de la planta bajo un Diseño Completamente Aleatorizado.
+* **Contexto:** Efecto de cuatro variedades de papa (*Solanum tuberosum*: A, B, C, D) sobre el desarrollo estructural bajo un Diseño Completamente Aleatorizado con 100 plantas (25 por variedad).
 * **Dataset:** `datos_manova_papa.csv`
 * **Diccionario de Variables:**
   * `Variedad` (Factor: A, B, C, D)
-  * *Vector respuesta:* `Y1` (Altura), `Y2` (Longitud tallo), `Y3` (Diámetro tubérculo), `Y4` (Longitud tubérculo) - *expresadas en cm*.
-* **Técnicas:** MANOVA, descomposición de Matrices SSCP (Suma de Cuadrados y Productos Cruzados), análisis de Traza de Pillai.
+  * *Vector respuesta:* `Y1` (Altura), `Y2` (Longitud tallo), `Y3` (Diámetro tubérculo), `Y4` (Longitud tubérculo) - *en cm*.
+* **Técnicas:** MANOVA con 4 criterios (Pillai, Wilks, Hotelling-Lawley, Roy), descomposición de Matrices SSCP, ANOVAs univariados de seguimiento, comparaciones por pares con Traza de Pillai.
+* **Hallazgo clave:** Todas las variedades difieren significativamente en las 4 variables (p < 2.2e-16), con **η² ≈ 1** (casi el 100% de variabilidad explicada). **Ningún par de variedades es equivalente**: los más disímiles son C vs D (Pillai = 0.915).
 
 #### 5. Optimización de Dietas Lecheras (MANOVA Factorial 2x2 en DBCA)
-* **Contexto:** Evaluación del sinergismo entre forraje y suplemento nutricional en ganado, aislando la madurez del animal.
+* **Contexto:** Evaluación del sinergismo entre forraje (Alfalfa/Ensilado) y suplemento (Con/Sin Concentrado) en ganado, aislando la variabilidad por número de partos mediante 5 bloques.
 * **Dataset:** `Data_Final_Vacas_PC1.csv`
 * **Diccionario de Variables:**
   * *Factores:* `Forraje` (Alfalfa/Ensilado), `Suplemento` (Con/Sin)
-  * *Bloque:* `Bloque` (Número de partos)
+  * *Bloque:* Número de partos (5 niveles)
   * *Vector respuesta:* `Produccion` (L/día), `Grasa` (%), `Proteina` (%)
-* **Técnicas:** Modelado de interacciones multivariadas, comparaciones múltiples (Tukey) post-hoc.
-* **Impacto:** Cuantificación estadística del "efecto de dilución" (aumento de volumen vs. caída de densidad de sólidos).
+* **Técnicas:** Modelado de interacciones multivariadas, análisis de efectos simples condicionados, comparaciones múltiples de Tukey post-hoc, cálculo de η² multivariado.
+* **Hallazgo clave:** Interacción altamente significativa (p < 0.0001). **Alfalfa + Concentrado maximiza producción** (+13.7 L/día vs +4.67 L/día con Ensilado), pero con **efecto de dilución**: caída de -0.82% en grasa y -0.55% en proteína. η² de interacción = 0.9817.
 
 #### 6. Protocolos de Rehabilitación de Rodilla (MANCOVA en DBCA)
-* **Contexto:** Estudio clínico evaluando terapias de recuperación física, controlando factores externos críticos.
-* **Dataset:** *Generado mediante simulación estocástica controlada en el script principal.*
+* **Contexto:** Estudio clínico evaluando 3 protocolos de rehabilitación física (A, B, C) con 10 bloques etarios, controlando factores externos críticos mediante covariables.
+* **Dataset:** Generado mediante simulación estocástica controlada (set.seed = 2025).
 * **Diccionario de Variables:**
   * `Protocolo` (Factor de tratamiento: A, B, C)
-  * `GrupoEtario` (Factor de Bloqueo)
+  * `GrupoEtario` (Factor de Bloqueo, 10 niveles)
   * *Covariables:* `FLEX_BASAL` (Ángulo inicial), `IMC` (Índice de Masa Corporal)
   * *Vector respuesta:* `FLEX_RODILLA` (Ángulo al alta), `FUERZA_CUAD` (kg/f al alta)
-* **Técnicas:** Análisis Multivariado de Covarianza (MANCOVA), ajuste de vectores de medias.
+* **Técnicas:** Análisis Multivariado de Covarianza (MANCOVA), ajuste de vectores de medias, comparación de eficiencia DCA vs DBCA mediante razón de determinantes.
+* **Hallazgo clave:** Los 3 protocolos producen perfiles de recuperación distintos (p < 0.05 en todas las comparaciones por pares). Ambas covariables son altamente significativas, justificando el MANCOVA sobre MANOVA. El bloqueo mejora la eficiencia en un porcentaje significativo.
 
 ---
 
 ### 🛠️ Stack Tecnológico
 * **Lenguaje:** R
-* **Ecosistema y Manipulación:** `tidyverse`, `dplyr`, `reshape2`
-* **Inferencia y Diagnóstico:** `ICSNP`, `MVTests`, `mvnormtest`, `heplots`, `biotools`, `psych`, `car`
+* **Ecosistema y Manipulación:** `tidyverse`, `dplyr`, `reshape2`, `readxl`, `readr`
+* **Inferencia y Diagnóstico:** `ICSNP`, `MVTests`, `mvnormtest`, `heplots`, `biotools`, `psych`, `car`, `MVN`
+* **Modelado y Comparaciones:** `emmeans`, `patchwork`, `gridExtra`
+* **Visualización:** `ggplot2`, `GGally`, `corrplot`, `ggthemes`
 * **Reportes y Compilación:** Quarto / RMarkdown (`knitr`, `kableExtra`)
 
 ### 💡 Flujo de Trabajo (Pipeline)
-Todos los scripts aplican la siguiente metodología de validación paramétrica antes de la inferencia:
-1. **Análisis Exploratorio:** Matrices de correlación, dispersión y detección de *outliers* multivariados (Distancia de Mahalanobis).
-2. **Diagnóstico de Supuestos:** Shapiro-Wilk Multivariado, Homogeneidad de Matrices de Covarianza (M de Box) y Prueba de Esfericidad de Bartlett.
-3. **Inferencia Conjunta:** Uso sistemático de estadísticos robustos (Traza de Pillai) y evaluación del tamaño del efecto global ($\eta^2$).
+Todos los análisis aplican la siguiente metodología de validación paramétrica antes de la inferencia:
+
+1. **Análisis Exploratorio:** Matrices de correlación, dispersión (ggpairs), boxplots comparativos y detección de *outliers* multivariados (Distancia de Mahalanobis).
+2. **Diagnóstico de Supuestos:**
+   - Normalidad Multivariada: Shapiro-Wilk multivariado, Mardia, Henze-Zirkler, Doornik-Hansen
+   - Homogeneidad de Matrices de Covarianza: Prueba M de Box
+   - Correlación entre variables: Prueba de Esfericidad de Bartlett
+3. **Inferencia Conjunta:** Uso sistemático de los 4 criterios multivariados (Pillai, Wilks, Hotelling-Lawley, Roy) priorizando Traza de Pillai por su robustez, y evaluación del tamaño del efecto global ($\eta^2$).
+4. **Análisis de Seguimiento:** ANOVAs univariados, comparaciones por pares y pruebas post-hoc de Tukey cuando corresponde.
 
 ---
 
-#### 👨‍💻 Sobre el Proyecto y el Equipo
+### 📊 Métricas de Evaluación
+
+| Técnica | Métrica Principal | Resultado Observado |
+|---------|-------------------|---------------------|
+| **Z² Multivariada** | Estadístico Z² vs χ² crítico | 284.31 >> 9.48 (p < 0.0001) |
+| **T² Hotelling (dep)** | p-valor vs metas clínicas | p = 0.447 (no rechaza H₀) |
+| **T² Hotelling (ind)** | p-valor vs vector μ₀ | p = 0.6395 (compatible con H₀) |
+| **MANOVA DCA** | η² multivariado | ≈ 1.00 (100% explicado) |
+| **MANOVA Factorial** | η² de interacción | 0.9817 (sinergia fuerte) |
+| **MANCOVA** | η² del modelo | > 0.85 con covariables sig. |
+
+---
+
+### 👨‍💻 Sobre el Proyecto y el Equipo
 
 Este repositorio es el resultado de un esfuerzo analítico y colaborativo desarrollado en el curso de Técnicas Multivariadas de la **Universidad Nacional Agraria La Molina (UNALM)**.
 
@@ -126,3 +153,5 @@ El desarrollo del marco teórico, análisis y revisión metodológica fue posibl
 **Conecta conmigo:**  
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jose-l-garay/)
 [![Correo](https://img.shields.io/badge/Correo-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:gaga4590joseluis@gmail.com)
+
+**Ver informe completo:** [PC1 - Grupo 1](https://joseluis02678.github.io/Applied-Multivariate-Analysis/PC1/PC1%20-%20Grupo%201.html)
