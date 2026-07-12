@@ -152,5 +152,3 @@ Instrumento de 15 ítems (n = 250) sobre Proactividad, Liderazgo y Empatía. Cor
 - **Sobero Aguirre, Fiorella Romina**
 
 ---
-
-📄 **Informe completo:** [Ver Informe](https://joseluis02678.github.io/Applied-Multivariate-Analysis/Parcial/grupo1_EVC_completo.html)
