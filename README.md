@@ -177,7 +177,12 @@ graph LR
 
 ## 👥 Equipo
 
-- **[@joseluis02678](https://github.com/joseluis02678)** — **Jose Luis Garay Ramos** (Líder análisis predictivo)
+**👨‍💻 Autor Principal:**
+- **[@joseluis02678](https://github.com/joseluis02678)** — **Jose Luis Garay Ramos** 
+  - *Líder de análisis predictivo y modelamiento*
+  - [LinkedIn](https://www.linkedin.com/in/jose-l-garay) | [GitHub](https://github.com/joseluis02678)
+
+**Colaboradores:**
 - [@jonnathan2023](https://github.com/jonnathan2023) — Jonathan Pedraza
 - [@AngelMol0810](https://github.com/AngelMol0810) — Angel Meza
 - [@Orsaki](https://github.com/Orsaki) — Daniel Ormeño
@@ -216,9 +221,9 @@ graph LR
 
 ## 📮 Contacto
 
-- **GitHub**: [@joseluis02678](https://github.com/joseluis02678)
-- **Email**: [añadir si es público]
-- **LinkedIn**: [perfil]
+- **GitHub**: [@joseluis02678](https://github.com/joseluis02678) — Ver código y proyectos
+- **LinkedIn**: [jose-l-garay](https://www.linkedin.com/in/jose-l-garay) — Conectar profesionalmente
+- **Email**: Disponible en LinkedIn
 
 ---
 
