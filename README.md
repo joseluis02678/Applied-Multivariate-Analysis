@@ -205,25 +205,11 @@ graph LR
 
 ---
 
-## 💡 Por qué este portafolio importa para roles de Data
-
-✅ **Prueba de habilidades de ML**: Manejo completo de pipeline (exploración → reducción → clasificación → predicción)
-
-✅ **Comunicación técnica clara**: Reportes Quarto que explican *qué* se hizo Y *por qué*
-
-✅ **Pensamiento estadístico**: No solo código, sino validación de supuestos y métricas de rendimiento
-
-✅ **Reproducibilidad**: Código versionado, modelos guardados, análisis documentado
-
-✅ **Contextualización de negocio**: Aplicaciones reales (agricultura, seguros, climate data)
-
----
-
 ## 📮 Contacto
 
-- **GitHub**: [@joseluis02678](https://github.com/joseluis02678) — Ver código y proyectos
-- **LinkedIn**: [jose-l-garay](https://www.linkedin.com/in/jose-l-garay) — Conectar profesionalmente
-- **Email**: Disponible en LinkedIn
+- **GitHub**: [@joseluis02678](https://github.com/joseluis02678)
+- **LinkedIn**: [jose-l-garay](https://www.linkedin.com/in/jose-l-garay)
+- **Email**: joseluisgarayramos23@gmail.com
 
 ---
 
